@@ -43,19 +43,39 @@ TODAY = dt.date.today().isoformat()
 EXPIRE_DAYS = 30          # drop a job this long after it was last seen in a feed
 UA = "findifsjobs-aggregator/0.1 (+https://findifsjobs.com)"
 
-# kind, id, display name, employer type, ifs_only
-# ifs_only=True  -> every job from this source is IFS work, keep all consulting roles
-# ifs_only=False -> keep a job only if its text clearly refers to IFS the ERP vendor
+# kind, id, display name, employer type, mode
+# mode True     -> the firm only does IFS work: keep every consulting-type role
+# mode False    -> keep a job only if its text clearly refers to IFS the ERP vendor
+# mode "vendor" -> IFS itself: keep customer-facing product roles, skip internal ones
 SOURCES = [
-    ("smartrecruiters", "IFS1", "IFS", "IFS vendor", True),
+    # Vendor
+    ("smartrecruiters", "IFS1", "IFS", "IFS vendor", "vendor"),
+    # Partners on a supported careers system
+    ("teamtailor", "career.arcwide.com", "Arcwide", "IFS partner", True),
     ("teamtailor", "job.novacura.com", "Novacura", "IFS partner", False),
     ("teamtailor", "careers.addovation.com", "Addovation", "IFS partner", True),
-    ("teamtailor", "career.arcwide.com", "Arcwide", "IFS partner", True),
-    ("recruitee", "infoconsultinggroup", "InfoConsulting", "IFS partner", False),
+    ("recruitee", "infoconsultinggroup", "InfoConsulting", "IFS partner", True),
+    ("smartrecruiters", "Eqeep", "Eqeep", "IFS partner", True),
+    ("workable", "inivos", "Inivos", "IFS partner", False),
+    ("breezy", "tsunami-tsolutions", "Tsunami Tsolutions", "IFS partner", False),
+    # Partners with their own careers page: we read the job links off the page
+    ("html", "https://www.wiasystems.com/careers", "WIA Systems", "IFS partner", True),
+    ("html", "https://platned.com/careers", "Platned", "IFS partner", False),
+    ("html", "https://e-analytics.com/careers", "Enterprise Analytics", "IFS partner", False),
+    ("html", "https://kaizens.co.uk/careers", "Kaizens Group", "IFS partner", False),
+    ("html", "https://iconique.tech/careers/", "Iconique", "IFS partner", True),
+    ("html", "https://xitricon.com/careers/", "Xitricon", "IFS partner", False),
+    ("html", "https://12guide.com/bedrijf/vacatures", "12Guide", "IFS partner", True),
+    ("html", "https://covalentworld.com/careers/", "Covalent Systems", "IFS partner", True),
+    ("html", "https://www.solika-consulting.com/en/jobs", "Solika Consulting", "IFS partner", True),
+    ("html", "https://www.flexicode.net/en/jobs/", "FLEXiCODE", "IFS partner", True),
+    # IFS customers
     ("workable", "bw-energy", "BW Energy", "IFS customer", False),
-    # Add IFS customers and partners here as you find their boards, e.g.
-    # ("greenhouse", "boardtoken", "Company", "IFS customer", False),
-    # ("lever", "site", "Company", "IFS customer", False),
+    # Recruiters
+    ("wprss", "https://goliverecruitment.com/live-jobs/feed/", "GoLive Recruitment", "Recruiter", True),
+    ("html", "https://www.cubiqrecruitment.com/search-jobs/", "Cubiq Recruitment", "Recruiter", False),
+    ("html", "https://www.itworksrec.co.uk/jobs/", "IT Works Recruitment", "Recruiter", False),
+    # Add more here, e.g. ("greenhouse", "boardtoken", "Company", "IFS customer", False),
 ]
 ADZUNA_COUNTRIES = ["gb", "us", "de", "nl", "au", "in", "ca", "se"]
 ADZUNA_QUERIES = ['"IFS Cloud"', '"IFS Applications"', '"IFS consultant"', '"IFS ERP"']
@@ -76,10 +96,20 @@ ROLE_WORDS = re.compile(
     r"project manager|programme manager|solution|specialist|administrator|test lead|practice", re.I)
 
 
+VENDOR_ROLES = re.compile(
+    r"\bIFS\b|consultant|implementation|solution architect|solutions architect|presales|pre-sales|"
+    r"\bEAM\b|\bFSM\b|\bERP\b|project manager|customer success|business analyst", re.I)
+VENDOR_SKIP = re.compile(
+    r"software engineer|full stack|security|legal|credit|treasury|IT support|platform engineer|applied ai|"
+    r"copperleaf|loops|recruit|marketing|finance systems|payroll|talent", re.I)
+
+
 def is_ifs_job(title, text, ifs_only=False):
     blob = f"{title}\n{text}"
     if NOT_IFS.search(blob):
         return False
+    if ifs_only == "vendor":
+        return bool(VENDOR_ROLES.search(title)) and not VENDOR_SKIP.search(title)
     if ifs_only:
         return bool(ROLE_WORDS.search(title))
     return bool(IFS_STRONG.search(blob))
@@ -148,13 +178,32 @@ def tag(title, text, country, remote_flag=None, employment=None):
     else:
         seniority = "Not stated"
     c = (country or "").strip().lower()
-    region = next((r for r, rx in REGIONS.items() if re.fullmatch(rx, c)), "Other")
+    region = next((r for r, rx in REGIONS.items() if re.fullmatch(rx, c)), "Location not stated")
     pay = None
     m = re.search(r"([£$€]\s?\d[\d,.]*\s?[kK]?\s?(?:-|–|to)\s?[£$€]?\s?\d[\d,.]*\s?[kK]?(?:\s?(?:per|a|/)\s?(?:day|hour|annum|year|month))?)", blob)
     if m:
         pay = re.sub(r"\s+", " ", m.group(1)).strip()
     return dict(area=area, ifs_version=version, work_mode=mode, contract_type=contract,
                 seniority=seniority, region=region, pay=pay)
+
+
+PLACES = {
+    "United Kingdom": r"\bUK\b|united kingdom|england|scotland|london|manchester|birmingham|leeds|bristol",
+    "United States": r"\bUSA?\b|united states|texas|houston|chicago|boston|atlanta|new york|florida|california",
+    "Sri Lanka": r"sri lanka|colombo", "India": r"\bindia\b|chennai|bengaluru|bangalore|pune|hyderabad|mumbai",
+    "Germany": r"germany|deutschland|m/[fw]/d|w/m/d|münchen|munich|berlin|hamburg|nürnberg|fürth",
+    "Sweden": r"sweden|stockholm|gothenburg|göteborg|linköping|malmö", "Norway": r"norway|oslo",
+    "Denmark": r"denmark|copenhagen", "Finland": r"finland|helsinki|espoo", "Netherlands": r"netherlands|nederland|utrecht|amsterdam",
+    "Poland": r"poland|warsaw|warszawa", "France": r"france|paris|lyon", "Canada": r"canada|toronto|ottawa|calgary",
+    "Australia": r"australia|sydney|melbourne|perth|brisbane", "United Arab Emirates": r"\bUAE\b|dubai|abu dhabi|sharjah",
+    "Saudi Arabia": r"saudi|riyadh|jeddah", "Switzerland": r"switzerland|zurich|zürich", "Belgium": r"belgium|brussels",
+    "Japan": r"japan|tokyo", "South Africa": r"south africa|johannesburg|cape town",
+}
+
+
+def guess_country(text):
+    """Best-effort country from a job title when the source gives no location."""
+    return next((c for c, rx in PLACES.items() if re.search(rx, text or "", re.I)), None)
 
 
 def strip_html(s):
@@ -268,6 +317,59 @@ def fetch_lever(site, name, ctype, ifs_only):
     return out
 
 
+def fetch_breezy(slug, name, ctype, ifs_only):
+    d = json.loads(get(f"https://{slug}.breezy.hr/json"))
+    out = []
+    for j in d:
+        loc = j.get("location") or {}
+        country = (loc.get("country") or {}).get("name") if isinstance(loc.get("country"), dict) else loc.get("country")
+        if is_ifs_job(j.get("name", ""), "", ifs_only):
+            out.append(make_job(j["name"], name, ctype, loc.get("city") or loc.get("name"), country, j.get("url"),
+                                "", j.get("published_date"), loc.get("is_remote"), (j.get("type") or {}).get("name")))
+    return out
+
+
+def fetch_wprss(url, name, ctype, ifs_only):
+    """WordPress job feeds: titles, links and dates only."""
+    root = ET.fromstring(get(url))
+    out = []
+    for it in root.iter("item"):
+        title = (it.findtext("title") or "").strip()
+        if not is_ifs_job(title, strip_html(it.findtext("description")), ifs_only):
+            continue
+        try:
+            pub = dt.datetime.strptime((it.findtext("pubDate") or "")[:16].strip(), "%a, %d %b %Y").date().isoformat()
+        except Exception:
+            pub = None
+        out.append(make_job(title, name, ctype, None, guess_country(title), it.findtext("link"), "", pub))
+    return out
+
+
+LINK = re.compile(r"<a\b[^>]*?href=[\"']([^\"'#]+)[\"'][^>]*>(.*?)</a>", re.S | re.I)
+JOB_PATH = re.compile(r"/(jobs?|vacanc\w*|vacatures?|careers?|positions?|openings?|ledige|roles?|stellen)/[^/?]{4,}|[?&]p=\d", re.I)
+NOT_A_TITLE = re.compile(r"^(view|apply|read|learn|see|all|open|join|our|about|contact|careers?|jobs?|more|back|home)\b|"
+                         r"cookie|privacy|linkedin|unsolicited|open application|initiativ", re.I)
+
+
+def fetch_html(url, name, ctype, ifs_only):
+    """Own-site careers pages: read job links straight off the listing page.
+    Works only when the jobs are in the page HTML (not loaded later by script)."""
+    page = get(url).decode("utf-8", "ignore")
+    seen, out = set(), []
+    for href, inner in LINK.findall(page):
+        full = urllib.parse.urljoin(url, html.unescape(href.strip()))
+        title = strip_html(re.split(r"</h[1-6]>|<br|</p>|</span>", inner, 1)[0]) or strip_html(inner)
+        if not full.startswith("https://") or full.rstrip("/") == url.rstrip("/") or not JOB_PATH.search(full):
+            continue
+        if not 8 <= len(title) <= 110 or len(title.split()) < 2 or NOT_A_TITLE.search(title):
+            continue
+        if not is_ifs_job(title, "", ifs_only) or title.lower() in seen:
+            continue
+        seen.add(title.lower())
+        out.append(make_job(title, name, ctype, None, guess_country(title), full))
+    return out
+
+
 def fetch_adzuna():
     app_id, key = os.environ.get("ADZUNA_APP_ID"), os.environ.get("ADZUNA_APP_KEY")
     if not (app_id and key):
@@ -292,7 +394,8 @@ def fetch_adzuna():
 
 
 FETCHERS = {"smartrecruiters": fetch_smartrecruiters, "teamtailor": fetch_teamtailor, "recruitee": fetch_recruitee,
-            "workable": fetch_workable, "greenhouse": fetch_greenhouse, "lever": fetch_lever}
+            "workable": fetch_workable, "greenhouse": fetch_greenhouse, "lever": fetch_lever,
+            "breezy": fetch_breezy, "wprss": fetch_wprss, "html": fetch_html}
 
 
 # -------------------------------------------------------------------- merge
@@ -304,8 +407,9 @@ def key(j):
 def merge(existing, fresh):
     """Keep hand-curated fields on jobs we already have; add new ones; expire stale ones."""
     by = {key(j): j for j in existing}
+    urls = {j.get("url"): k for k, j in by.items()}
     for j in fresh:
-        k = key(j)
+        k = urls.get(j.get("url")) or key(j)
         if k in by:
             by[k]["last_seen"] = TODAY
         else:
