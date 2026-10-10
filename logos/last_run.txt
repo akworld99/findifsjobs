@@ -1,0 +1,12 @@
+89 of 98 firms have a logo or icon
+icon  1898 & Co.: not a usable image (image/png, 171 bytes)
+icon  BW Energy: HTTP Error 404: Not Found
+icon  Curit: not a usable image (image/png, 608 bytes)
+icon  InfoConsulting: not a usable image (image/png, 214 bytes)
+icon  Kreuzbauer IT: HTTP Error 404: Not Found
+icon  L-Systems: HTTP Error 404: Not Found
+icon  ProV International: HTTP Error 404: Not Found
+icon  Robert Half: not a usable image (image/png, 228 bytes)
+icon  Solika Consulting: HTTP Error 404: Not Found
+icon  Technodyn International: HTTP Error 404: Not Found
+icon  Vivicta: not a usable image (image/png, 281 bytes)
