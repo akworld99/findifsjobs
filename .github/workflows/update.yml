@@ -40,7 +40,7 @@ jobs:
           ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}   # optional
 
       - name: Fetch company logos
-        run: python fetch_logos.py || echo "Logo fetch had problems, building with what we have"
+        run: pip install -q pillow && python fetch_logos.py || echo "Logo fetch had problems, building with what we have"
 
       - name: Build the page
         run: |

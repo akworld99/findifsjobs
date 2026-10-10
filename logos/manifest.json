@@ -1,6 +1,6 @@
 {
  "12guide": {
-  "wide": "logos/wide/12guide.jpg",
+  "wide": "logos/wide/12guide.png",
   "icon": "logos/icon/12guide.png"
  },
  "1898 & co.": {
@@ -14,7 +14,7 @@
   "icon": "logos/icon/acp-digital.png"
  },
  "accenture": {
-  "wide": "logos/wide/accenture.jpg",
+  "wide": "logos/wide/accenture.png",
   "icon": "logos/icon/accenture.png"
  },
  "adastra resource group": {
@@ -22,7 +22,7 @@
   "icon": "logos/icon/adastra-resource-group.jpg"
  },
  "addovation": {
-  "wide": "logos/wide/addovation.jpg",
+  "wide": "logos/wide/addovation.png",
   "icon": "logos/icon/addovation.png"
  },
  "align consulting": {
@@ -30,7 +30,7 @@
   "icon": "logos/icon/align-consulting.ico"
  },
  "alphast": {
-  "wide": "logos/wide/alphast.jpg",
+  "wide": "logos/wide/alphast.png",
   "icon": "logos/icon/alphast.png"
  },
  "anthesis": {
@@ -42,15 +42,15 @@
   "icon": "logos/icon/arcwide.png"
  },
  "astra canyon": {
-  "wide": "logos/wide/astra-canyon.jpg",
+  "wide": "logos/wide/astra-canyon.png",
   "icon": "logos/icon/astra-canyon.png"
  },
  "baker tilly": {
-  "wide": "logos/wide/baker-tilly.jpg",
+  "wide": "logos/wide/baker-tilly.png",
   "icon": "logos/icon/baker-tilly.png"
  },
  "bearingpoint": {
-  "wide": "logos/wide/bearingpoint.jpg",
+  "wide": "logos/wide/bearingpoint.png",
   "icon": "logos/icon/bearingpoint.png"
  },
  "cgi": {
@@ -58,7 +58,7 @@
   "icon": "logos/icon/cgi.jpg"
  },
  "capgemini": {
-  "wide": "logos/wide/capgemini.jpg",
+  "wide": "logos/wide/capgemini.png",
   "icon": "logos/icon/capgemini.png"
  },
  "cast uk": {
@@ -77,7 +77,7 @@
   "icon": "logos/icon/cegeka.png"
  },
  "cooper software": {
-  "wide": "logos/wide/cooper-software.jpg",
+  "wide": "logos/wide/cooper-software.png",
   "icon": "logos/icon/cooper-software.png"
  },
  "coredrive": {
@@ -85,7 +85,7 @@
   "icon": "logos/icon/coredrive.png"
  },
  "covalent systems": {
-  "wide": "logos/wide/covalent-systems.webp",
+  "wide": "logos/wide/covalent-systems.png",
   "icon": "logos/icon/covalent-systems.png"
  },
  "cubiq recruitment": {
@@ -93,14 +93,14 @@
   "icon": "logos/icon/cubiq-recruitment.png"
  },
  "curit": {
-  "wide": "logos/wide/curit.jpg"
+  "wide": "logos/wide/curit.png"
  },
  "dnastream": {
-  "wide": "logos/wide/dnastream.jpg",
+  "wide": "logos/wide/dnastream.png",
   "icon": "logos/icon/dnastream.png"
  },
  "delegate it": {
-  "wide": "logos/wide/delegate-it.jpg",
+  "wide": "logos/wide/delegate-it.png",
   "icon": "logos/icon/delegate-it.jpg"
  },
  "deloitte": {
@@ -113,7 +113,7 @@
   "icon": "logos/icon/empiric.png"
  },
  "enterprise analytics": {
-  "wide": "logos/wide/enterprise-analytics.jpg",
+  "wide": "logos/wide/enterprise-analytics.png",
   "icon": "logos/icon/enterprise-analytics.png"
  },
  "eqeep": {
@@ -134,11 +134,11 @@
   "icon": "logos/icon/expert-hiring.png"
  },
  "expleo": {
-  "wide": "logos/wide/expleo.jpg",
+  "wide": "logos/wide/expleo.png",
   "icon": "logos/icon/expleo.png"
  },
  "exsitec": {
-  "wide": "logos/wide/exsitec.jpg",
+  "wide": "logos/wide/exsitec.png",
   "icon": "logos/icon/exsitec.png"
  },
  "fi solutions": {
@@ -171,7 +171,7 @@
   "icon": "logos/icon/ifs.png"
  },
  "isintegrasi": {
-  "wide": "logos/wide/isintegrasi.jpg",
+  "wide": "logos/wide/isintegrasi.png",
   "icon": "logos/icon/isintegrasi.jpg"
  },
  "it works recruitment": {
@@ -179,14 +179,14 @@
   "icon": "logos/icon/it-works-recruitment.png"
  },
  "iconique": {
-  "wide": "logos/wide/iconique.jpg",
+  "wide": "logos/wide/iconique.png",
   "icon": "logos/icon/iconique.jpg"
  },
  "infoconsulting": {
   "wide": "logos/wide/infoconsulting.png"
  },
  "infosys": {
-  "wide": "logos/wide/infosys.jpg",
+  "wide": "logos/wide/infosys.png",
   "icon": "logos/icon/infosys.png"
  },
  "inivos": {
@@ -197,11 +197,11 @@
   "icon": "logos/icon/interpath-advisory.png"
  },
  "inzuscene": {
-  "wide": "logos/wide/inzuscene.jpg",
+  "wide": "logos/wide/inzuscene.png",
   "icon": "logos/icon/inzuscene.png"
  },
  "k4-u (groupe kardol)": {
-  "wide": "logos/wide/k4-u-groupe-kardol.jpg",
+  "wide": "logos/wide/k4-u-groupe-kardol.png",
   "icon": "logos/icon/k4-u-groupe-kardol.png"
  },
  "kaizens group": {
@@ -209,21 +209,21 @@
   "icon": "logos/icon/kaizens-group.png"
  },
  "kreuzbauer it": {
-  "wide": "logos/wide/kreuzbauer-it.jpg"
+  "wide": "logos/wide/kreuzbauer-it.png"
  },
  "krish it solutions": {
-  "wide": "logos/wide/krish-it-solutions.jpg",
+  "wide": "logos/wide/krish-it-solutions.png",
   "icon": "logos/icon/krish-it-solutions.png"
  },
  "l-systems": {
-  "wide": "logos/wide/l-systems.jpg"
+  "wide": "logos/wide/l-systems.png"
  },
  "muzulu": {
-  "wide": "logos/wide/muzulu.jpg",
+  "wide": "logos/wide/muzulu.png",
   "icon": "logos/icon/muzulu.png"
  },
  "nec": {
-  "wide": "logos/wide/nec.jpg",
+  "wide": "logos/wide/nec.png",
   "icon": "logos/icon/nec.ico"
  },
  "novacura": {
@@ -237,7 +237,7 @@
   "icon": "logos/icon/psd-energy.ico"
  },
  "platned": {
-  "wide": "logos/wide/platned.jpg",
+  "wide": "logos/wide/platned.png",
   "icon": "logos/icon/platned.png"
  },
  "proactive appointments": {
@@ -245,7 +245,7 @@
   "icon": "logos/icon/proactive-appointments.png"
  },
  "pwc": {
-  "wide": "logos/wide/pwc.jpg",
+  "wide": "logos/wide/pwc.png",
   "icon": "logos/icon/pwc.png"
  },
  "randstad malaysia": {
@@ -267,11 +267,11 @@
   "icon": "logos/icon/sebsa.png"
  },
  "slk consulting partners": {
-  "wide": "logos/wide/slk-consulting-partners.jpg",
+  "wide": "logos/wide/slk-consulting-partners.png",
   "icon": "logos/icon/slk-consulting-partners.jpg"
  },
  "sun2mars": {
-  "wide": "logos/wide/sun2mars.jpg",
+  "wide": "logos/wide/sun2mars.png",
   "icon": "logos/icon/sun2mars.png"
  },
  "saudi business machines": {
@@ -289,7 +289,7 @@
   "icon": "logos/icon/system-one.png"
  },
  "tech mahindra": {
-  "wide": "logos/wide/tech-mahindra.jpg",
+  "wide": "logos/wide/tech-mahindra.png",
   "icon": "logos/icon/tech-mahindra.png"
  },
  "technodyn international": {
@@ -311,11 +311,11 @@
   "wide": "logos/wide/vivicta.png"
  },
  "wia systems": {
-  "wide": "logos/wide/wia-systems.jpg",
+  "wide": "logos/wide/wia-systems.png",
   "icon": "logos/icon/wia-systems.png"
  },
  "wyre solutions": {
-  "wide": "logos/wide/wyre-solutions.jpg",
+  "wide": "logos/wide/wyre-solutions.png",
   "icon": "logos/icon/wyre-solutions.png"
  },
  "xapiens": {

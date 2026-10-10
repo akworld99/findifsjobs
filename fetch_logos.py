@@ -33,6 +33,37 @@ def grab(url, min_bytes=300):
     return data, EXT[ctype]
 
 
+def trim(path):
+    """Crop the empty margin around a raster logo so it fills its box. Needs Pillow; skipped without it."""
+    try:
+        from PIL import Image, ImageChops
+    except ImportError:
+        return
+    if path.suffix.lower() not in (".png", ".jpg", ".jpeg", ".webp"):
+        return
+    try:
+        im = Image.open(path).convert("RGBA")
+        flat = Image.new("RGBA", im.size, (255, 255, 255, 255))
+        flat.alpha_composite(im)
+        diff = ImageChops.difference(flat.convert("RGB"), Image.new("RGB", im.size, (255, 255, 255)))
+        box = diff.point(lambda v: 255 if v > 18 else 0).getbbox()
+        if not box:
+            return                                   # all white (a white-on-clear logo): leave it alone
+        w, h = box[2] - box[0], box[3] - box[1]
+        if w * h > 0.8 * im.size[0] * im.size[1] and max(im.size) <= 600:
+            return                                   # already tight and small
+        pad = max(2, int(0.04 * max(w, h)))
+        box = (max(0, box[0] - pad), max(0, box[1] - pad), min(im.size[0], box[2] + pad), min(im.size[1], box[3] + pad))
+        im = im.crop(box)
+        im.thumbnail((480, 240))
+        out = path.with_suffix(".png")
+        im.save(out, optimize=True)
+        if out != path:
+            path.unlink()
+    except Exception:
+        pass
+
+
 def existing(folder, s):
     return next((p for p in folder.glob(s + ".*")), None)
 
@@ -57,6 +88,8 @@ def main():
                 data, ext = grab(logo_url)
                 w = WIDE / f"{s}.{ext}"
                 w.write_bytes(data)
+                trim(w)
+                w = existing(WIDE, s)
             except Exception as e:
                 log.append(f"wide  {name}: {str(e)[:80]}")
         if w:
