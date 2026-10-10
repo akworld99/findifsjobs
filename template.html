@@ -95,7 +95,9 @@ select:hover,input:hover{border-color:var(--line-strong)}
 .empty{padding:24px 18px;color:var(--muted)}
 
 .logo{position:relative;width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-weight:600;font-size:.86rem;color:var(--brand-dark);background:var(--brand-soft);overflow:hidden;flex:none}
-.logo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:var(--bg);padding:4px;border:1px solid var(--line);border-radius:10px}
+.logo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:var(--bg);padding:5px;border:1px solid var(--line);border-radius:10px}
+.logo.wide{width:104px}
+.logo.wide img{padding:6px 8px}
 @media(max-width:640px){.logo{width:38px;height:38px}}
 
 /* rankings */
@@ -313,14 +315,15 @@ const uniq = (arr, k) => [...new Set(arr.map(j => j[k]))].filter(v => v && v !==
 const safe = u => /^https:\/\//.test(u || "") ? u : "";
 const ext = (u, t) => safe(u) ? `<a href="${esc(u)}" target="_blank" rel="noopener nofollow">${t}</a>` : "";
 
-/* Logos load once the site is on its own domain. Until then tiles show initials. */
-const LOGOS_ON = /findifsjobs\.com$/i.test(location.hostname);
-const logoOf = {}; PARTNERS.concat(RECRUITERS).forEach(p => { if (p.logo) logoOf[p.n.toLowerCase()] = p.logo; });
-function logo(name, url){
+/* Logos are files in /logos, downloaded by fetch_logos.py. Rows use the small square icon, cards the full logo. No file = initials. */
+const LOGOS = /*LOGOS*/{};
+function logo(name, wide){
+  const key = name.replace(/^IFS \(.*\)$/,"IFS").toLowerCase(), l = LOGOS[key] || {};
   const words = name.replace(/\(.*?\)/g,"").trim().split(/[\s&-]+/).filter(Boolean);
   const ini = (words.length > 1 ? words[0][0] + words[1][0] : name.slice(0,2)).toUpperCase();
-  url = url || logoOf[name.toLowerCase()];
-  return `<span class="logo" aria-hidden="true">${esc(ini)}${LOGOS_ON && safe(url) ? `<img src="${esc(url)}" alt="" loading="lazy">` : ""}</span>`;
+  const src = wide ? (l.wide || l.icon) : (l.icon || l.wide);
+  const isWide = wide && l.wide;
+  return `<span class="logo${isWide ? " wide" : ""}" aria-hidden="true">${esc(ini)}${src ? `<img src="${esc(src)}" alt="" loading="lazy">` : ""}</span>`;
 }
 document.addEventListener("error", e => { if (e.target.tagName === "IMG") e.target.remove(); }, true);
 
@@ -355,7 +358,7 @@ function renderJobs(){
   $("#jobs").innerHTML = list.length ? list.map(j => {
     const tags = [j.area, j.ifs_version, j.work_mode, j.contract_type].filter(x => x && x !== "Not stated");
     const loc = [j.city !== "Not stated" ? j.city : null, j.country !== "Not stated" ? j.country : null].filter(Boolean).join(", ");
-    return `<li class="row">${logo(j.company.replace(/^IFS \(.*\)$/,"IFS"))}<div class="body">
+    return `<li class="row">${logo(j.company)}<div class="body">
       <h3><a href="${esc(safe(j.url))}" target="_blank" rel="noopener nofollow">${esc(j.title)}</a></h3>
       <p class="meta"><b>${esc(j.company)}</b>${loc ? " · " + esc(loc) : ""} · ${esc(j.company_type)}</p>
       <div class="tags">${tags.map(x => `<span class="tag${x==="IFS Cloud"?" v":""}">${esc(x)}</span>`).join("")}</div></div>
@@ -384,7 +387,7 @@ function renderTop(){
   document.querySelectorAll("#t-pills .pill").forEach(b => b.setAttribute("aria-pressed", b.dataset.r === tRegion));
   $("#t-title").textContent = "Top 10 IFS partners in " + REG[tRegion][1];
   const list = PARTNERS.filter(p => p.r.includes(tRegion)).map(p => ({p, s: p.score + (p.home === tRegion ? 3 : 0)})).sort((a,b) => b.s - a.s || a.p.n.localeCompare(b.p.n)).slice(0,10);
-  $("#t-list").innerHTML = list.map(({p}) => `<li class="row">${logo(p.n,p.logo)}<div class="body">
+  $("#t-list").innerHTML = list.map(({p}) => `<li class="row">${logo(p.n)}<div class="body">
     <h3>${esc(p.n)}</h3><p class="meta">${esc(p.hq)}${p.size ? " · " + esc(p.size) : ""}</p>
     <p class="sum">${esc(p.sig || p.blurb)}</p>${p.awards ? `<p class="kv"><b>Awards:</b> ${esc(p.awards)}</p>` : ""}
     <div class="tags">${tagsFor(p)}</div></div><div class="side"><div class="links">${partnerLinks(p)}</div></div></li>`).join("");
@@ -399,7 +402,7 @@ function renderPartners(){
   const list = PARTNERS.filter(p => (!r || p.r.includes(r)) && (!k || p.kind === k) && (!q || [p.n,p.hq,p.focus,p.blurb,p.tier].join(" ").toLowerCase().includes(q)));
   list.sort(s === "az" ? (a,b) => a.n.localeCompare(b.n) : s === "tier" ? (a,b) => (TIERV[b.tier]||0) - (TIERV[a.tier]||0) || a.n.localeCompare(b.n) : (a,b) => b.score - a.score || a.n.localeCompare(b.n));
   $("#p-count").textContent = `${list.length} of ${PARTNERS.length} partners`;
-  $("#p-list").innerHTML = list.length ? list.map(p => `<li class="cell"><div class="head">${logo(p.n,p.logo)}<div class="body"><h3>${esc(p.n)}</h3><p class="meta">${esc(p.hq)}</p></div></div>
+  $("#p-list").innerHTML = list.length ? list.map(p => `<li class="cell"><div class="head">${logo(p.n, true)}<div class="body"><h3>${esc(p.n)}</h3><p class="meta">${esc(p.hq)}</p></div></div>
     <p class="sum">${esc(p.blurb)}</p>
     <p class="kv"><b>Focus:</b> ${esc(p.focus)}</p>${p.size ? `<p class="kv"><b>Size:</b> ${esc(p.size)}</p>` : ""}
     <p class="kv"><b>Active in:</b> ${p.r.map(x => REG[x][0]).join(", ")}</p>
@@ -409,7 +412,7 @@ function renderPartners(){
 renderPartners();
 
 /* ---------- recruiters ---------- */
-const rc = r => `<li class="cell"><div class="head">${logo(r.n,r.logo)}<div class="body"><h3>${esc(r.n)}</h3><p class="meta">${esc(r.hq)}</p></div></div>
+const rc = r => `<li class="cell"><div class="head">${logo(r.n, true)}<div class="body"><h3>${esc(r.n)}</h3><p class="meta">${esc(r.hq)}</p></div></div>
   <p class="sum">${esc(r.blurb)}</p><p class="kv"><b>Covers:</b> ${esc(r.cover)}</p><p class="kv"><b>Evidence:</b> ${esc(r.ev)}</p>
   <div class="tags"><span class="tag${r.tier===1?" v":""}">${esc(r.focus)}</span>${r.type ? `<span class="tag">${esc(r.type)}</span>` : ""}</div>
   <div class="foot">${[ext(r.web,"Website"), ext(r.jobs,"IFS jobs"), ext(r.src,"Source")].filter(Boolean).join("")}</div></li>`;

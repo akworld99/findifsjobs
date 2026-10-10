@@ -30,9 +30,10 @@ for p in partners:
 recruiters = load("recruiters.json")
 news = load("news.json") if (here / "news.json").exists() else []
 freelancers = load("freelancers.json") if (here / "freelancers.json").exists() else []
+logos = load("logos/manifest.json") if (here / "logos" / "manifest.json").exists() else {}
 
 page = (here / "template.html").read_text(encoding="utf-8")
 page = page.replace("/*JOBS*/[]", dump(jobs)).replace("/*PARTNERS*/[]", dump(partners)).replace("/*RECRUITERS*/[]", dump(recruiters))
-page = page.replace("/*NEWS*/[]", dump(news)).replace("/*FREELANCERS*/[]", dump(freelancers))
+page = page.replace("/*NEWS*/[]", dump(news)).replace("/*FREELANCERS*/[]", dump(freelancers)).replace("/*LOGOS*/{}", dump(logos))
 (here / "index.html").write_text(page, encoding="utf-8")
 print(f"index.html built: {len(jobs)} jobs, {len(partners)} partners, {len(recruiters)} recruiters")
