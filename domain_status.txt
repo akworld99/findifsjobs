@@ -1,2 +1,2 @@
 could not set domain from the workflow
-{"cname":"findifsjobs.com","https_enforced":false,"status":null}
+{"cname":"findifsjobs.com","https_enforced":true,"status":null}
