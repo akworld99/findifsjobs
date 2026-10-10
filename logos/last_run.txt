@@ -8,4 +8,4 @@ icon  ProV International: HTTP Error 404: Not Found
 icon  Robert Half: not a usable image (image/png, 228 bytes)
 icon  Solika Consulting: HTTP Error 404: Not Found
 icon  Technodyn International: HTTP Error 404: Not Found
-icon  Vivicta: HTTP Error 404: Not Found
+icon  Vivicta: not a usable image (image/png, 281 bytes)
