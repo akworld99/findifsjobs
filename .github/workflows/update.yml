@@ -8,7 +8,7 @@ on:
   workflow_dispatch:        # lets you press "Run workflow" by hand
   push:
     branches: [main]
-    paths-ignore: ["jobs.json", "last_run.txt", "logos/**", "domain_status.txt"]   # the bot's own data commit must not trigger another run
+    paths-ignore: ["jobs.json", "last_run.txt", "indexnow_sent.txt", "indexnow_status.txt", "logos/**", "domain_status.txt"]   # the bot's own data commit must not trigger another run
 
 permissions:
   contents: write   # commit the refreshed jobs.json
@@ -68,3 +68,11 @@ jobs:
 
       - id: deploy
         uses: actions/deploy-pages@v4
+
+      - name: Tell Bing about new pages
+        run: |
+          sleep 20
+          python indexnow.py | tee indexnow_status.txt
+          git add indexnow_sent.txt indexnow_status.txt 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "IndexNow: record submitted pages"
+          git pull -q --rebase && git push || true

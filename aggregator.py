@@ -210,7 +210,19 @@ def strip_html(s):
     return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", s or ""))).strip()
 
 
-def make_job(title, company, ctype, city, country, url, text="", posted=None, remote=None, employment=None):
+def excerpt(text, limit=900):
+    """A short extract of the employer's own advert, cut at a sentence end. The full advert stays on the employer's page."""
+    text = (text or "").strip()
+    if len(text) < 200:
+        return None
+    if len(text) <= limit:
+        return text
+    cut = text[:limit]
+    end = max(cut.rfind(". "), cut.rfind("! "), cut.rfind("? "))
+    return cut[:end + 1] if end > limit * 0.5 else cut.rsplit(" ", 1)[0] + " ..."
+
+
+def make_job(title, company, ctype, city, country, url, text="", posted=None, remote=None, employment=None, detail=None):
     t = tag(title, text, country, remote, employment)
     bits = [t["seniority"] if t["seniority"] != "Not stated" else "", t["area"], "role at", company]
     where = ", ".join(x for x in (city, country) if x)
@@ -220,6 +232,7 @@ def make_job(title, company, ctype, city, country, url, text="", posted=None, re
         "posted": (posted or "")[:10] or None, "url": url,
         # Our own one-line summary. We do not republish the advertiser's description.
         "summary": " ".join(b for b in bits if b) + (f" in {where}." if where else "."),
+        "excerpt": excerpt(detail),
     }
 
 
@@ -239,11 +252,17 @@ def fetch_smartrecruiters(cid, name, ctype, ifs_only):
             title = p.get("name", "")
             dept = (p.get("department") or {}).get("label", "")
             if is_ifs_job(title, dept, ifs_only):
+                detail = None
+                try:   # the list has no advert text; the posting itself does
+                    sec = json.loads(get(f"https://api.smartrecruiters.com/v1/companies/{cid}/postings/{p['id']}")).get("jobAd", {}).get("sections", {})
+                    detail = strip_html(" ".join((sec.get(k) or {}).get("text", "") for k in ("jobDescription", "qualifications")))
+                except Exception:
+                    pass
                 out.append(make_job(title, name, ctype, loc.get("city"), loc.get("fullLocation", "").split(",")[-1].strip()
                                     or loc.get("country", "").upper(),
                                     f"https://jobs.smartrecruiters.com/{cid}/{p['id']}", dept,
                                     p.get("releasedDate"), loc.get("remote"),
-                                    (p.get("typeOfEmployment") or {}).get("label")))
+                                    (p.get("typeOfEmployment") or {}).get("label"), detail=detail))
         offset += 100
         if offset >= d.get("totalFound", 0):
             return out
@@ -265,7 +284,7 @@ def fetch_teamtailor(host, name, ctype, ifs_only):
             except Exception:
                 pub = None
             out.append(make_job(title, name, ctype, city, country, it.findtext("link"), text, pub,
-                                (it.findtext("{*}remoteStatus") or "") == "fully"))
+                                (it.findtext("{*}remoteStatus") or "") == "fully", detail=text))
     return out
 
 
@@ -276,7 +295,7 @@ def fetch_recruitee(slug, name, ctype, ifs_only):
         text = strip_html(o.get("description", "") + " " + o.get("requirements", ""))
         if is_ifs_job(o.get("title", ""), text, ifs_only):
             out.append(make_job(o["title"], name, ctype, o.get("city"), o.get("country"), o.get("careers_url"),
-                                text, o.get("published_at"), o.get("remote"), o.get("employment_type_code")))
+                                text, o.get("published_at"), o.get("remote"), o.get("employment_type_code"), detail=text))
     return out
 
 
@@ -287,7 +306,7 @@ def fetch_workable(slug, name, ctype, ifs_only):
         text = strip_html(j.get("description", ""))
         if is_ifs_job(j.get("title", ""), text, ifs_only):
             out.append(make_job(j["title"], name, ctype, j.get("city"), j.get("country"), j.get("url"),
-                                text, j.get("published_on"), j.get("telecommuting"), j.get("employment_type")))
+                                text, j.get("published_on"), j.get("telecommuting"), j.get("employment_type"), detail=text))
     return out
 
 
@@ -429,6 +448,8 @@ def merge(existing, fresh):
         k = urls.get(j.get("url")) or key(j)
         if k in by:
             by[k]["last_seen"] = TODAY
+            if j.get("excerpt"):
+                by[k]["excerpt"] = j["excerpt"]
         else:
             by[k] = {**j, "first_seen": TODAY, "last_seen": TODAY}
     cutoff = (dt.date.today() - dt.timedelta(days=EXPIRE_DAYS)).isoformat()

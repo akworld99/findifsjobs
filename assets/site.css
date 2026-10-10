@@ -297,3 +297,8 @@ a:hover .go i{transform:translateX(5px)}
 .mstrip .go i{font-style:normal;display:inline-block;margin-left:4px;transition:transform .15s}
 .mstrip:hover .go i{transform:translateX(5px)}
 @media(max-width:640px){.mstrip{padding:26px 22px}.mstrip strong em{display:block}.mstrip .go{width:100%;text-align:center}}
+.prose .answer{background:var(--brand-soft);border-left:3px solid var(--brand);border-radius:var(--r);padding:16px 18px;font-size:1.02rem;line-height:1.6}
+.prose ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px}
+.prose h2{margin-top:10px}
+.note img.badge{width:220px;max-width:100%;height:auto;border-radius:11px}
+textarea.code{width:100%;font:400 .72rem/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;resize:none;word-break:break-all}

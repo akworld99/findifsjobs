@@ -80,6 +80,21 @@ apath = lambda a: f"ifs-jobs/{slug(a)}-jobs/"
 SPECIAL = {"remote": ("Remote and hybrid IFS jobs", lambda j: j["remote"], "ifs-jobs/remote/"),
            "contract": ("IFS contract jobs", lambda j: j.get("contract_type") == "Contract", "ifs-jobs/contract/"),
            "cloud": ("IFS Cloud jobs", lambda j: j.get("ifs_version") == "IFS Cloud", "ifs-jobs/ifs-cloud/")}
+_T = r"technical|developer|development|integration|engineer|programmer"
+_title = lambda rx: (lambda j: bool(re.search(rx, j["title"], re.I)))
+ROLES = {"functional": ("IFS functional consultant jobs", lambda j: bool(re.search(r"consultant", j["title"], re.I)) and not re.search(_T + r"|architect", j["title"], re.I), "ifs-jobs/functional-consultant/"),
+         "technical": ("IFS technical consultant and developer jobs", _title(_T), "ifs-jobs/technical-developer/"),
+         "architect": ("IFS solution architect jobs", _title(r"architect"), "ifs-jobs/solution-architect/"),
+         "pm": ("IFS project manager jobs", _title(r"project manager|program(me)? manager|delivery manager|project lead|project director"), "ifs-jobs/project-manager/"),
+         "support": ("IFS support jobs", _title(r"support"), "ifs-jobs/support/")}
+ROLE_N = {k: sum(1 for j in jobs if v[1](j)) for k, v in ROLES.items()}
+# Technical, architect, PM and support already have a module page each, so only the functional page is new.
+AREA_ROLE = {"technical": "Technical / Development", "architect": "Architecture", "pm": "Project Management", "support": "Support / Admin"}
+ROLES = {k: (v[0], v[1], apath(AREA_ROLE[k]) if k in AREA_ROLE else v[2]) for k, v in ROLES.items() if ROLE_N[k] >= 3 and AREA_ROLE.get(k, 1) in (1, *areas)}
+ROLE_N.update({k: areas[a] for k, a in AREA_ROLE.items() if a in areas})
+AREA_H = {AREA_ROLE[k]: ROLES[k][0] for k in ROLES if k in AREA_ROLE}
+SPECIAL["functional"] = ROLES["functional"]
+ROLE_SHORT = {"functional": "Functional consultant", "technical": "Technical and developer", "architect": "Solution architect", "pm": "Project manager", "support": "Support"}
 
 # ------------------------------------------------------------------ components
 PAGES = []          # (path, lastmod, priority) for the sitemap
@@ -168,8 +183,8 @@ def faq(items):
     return f'<section class="stack"><h2>Questions people ask</h2><div class="faq">{body}</div></section>', ld
 
 
-NAV = [("", "Jobs"), ("top-ifs-partners/", "Top 10 partners"), ("partners/", "Partner directory"), ("ifs-recruiters/", "Recruiters"),
-       ("freelancers/", "Freelancers"), ("news/", "What's new"), ("ifs-hiring-report/", "Hiring report")]
+NAV = [("", "Jobs"), ("top-ifs-partners/", "Top 10"), ("partners/", "Partners"), ("ifs-recruiters/", "Recruiters"),
+       ("freelancers/", "Freelancers"), ("news/", "What's new"), ("ifs-hiring-report/", "Hiring report"), ("marketing-for-ifs-partners/", "Marketing")]
 
 
 def page(path, title, desc, body, active="", ld=(), crumbs=(), priority="0.6", lastmod=None, index=True):
@@ -194,6 +209,7 @@ def page(path, title, desc, body, active="", ld=(), crumbs=(), priority="0.6", l
             f'<title>{e(title)}</title><meta name="description" content="{e(desc)}"><link rel="canonical" href="{e(url)}">'
             f'{"" if index else "<meta name=\"robots\" content=\"noindex\">"}'
             f'{f"<meta name=\"google-site-verification\" content=\"{e(sc)}\">" if sc else ""}'
+            f'{f"<meta name=\"msvalidate.01\" content=\"{e(CFG.get("bing_meta"))}\">" if CFG.get("bing_meta") else ""}'
             f'<meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{e(url)}">'
             f'<meta property="og:type" content="website"><meta property="og:site_name" content="findifsjobs"><meta name="twitter:card" content="summary">'
             f'<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
@@ -206,7 +222,7 @@ def page(path, title, desc, body, active="", ld=(), crumbs=(), priority="0.6", l
     footer = (f'<footer><div class="wrap"><div style="display:flex;flex-direction:column;gap:10px"><h2>New IFS jobs every Monday</h2>'
               f'<form class="news-form" data-kind="newsletter" data-done="Subscribed. The next issue arrives on Monday."><input type="email" name="email" placeholder="you@company.com" aria-label="Email address" required>'
               f'<button class="btn" type="submit">Subscribe</button></form><p class="msg" hidden style="max-width:480px"></p></div>'
-              f'<ul class="linklist"><li><a href="{root}about/">About and method</a></li><li><a href="{root}ifs-hiring-report/">IFS hiring report</a></li>'
+              f'<ul class="linklist"><li><a href="{root}about/">About and method</a></li><li><a href="{root}guides/">IFS career guides</a></li><li><a href="{root}ifs-partners/">IFS partners by country</a></li><li><a href="{root}ifs-hiring-report/">IFS hiring report</a></li>'
               f'<li><a href="{root}ifs-jobs/remote/">Remote IFS jobs</a></li><li><a href="{root}ifs-jobs/contract/">IFS contract jobs</a></li>'
               f'<li><a href="{root}ifs-jobs/ifs-cloud/">IFS Cloud jobs</a></li><li><a href="{root}hire/">Hire IFS talent</a></li><li><a href="{root}marketing-for-ifs-partners/">Marketing for IFS partners</a></li></ul>'
               f'<p><b style="color:var(--ink);font-weight:500">findifsjobs.com</b> is an independent job board. It is not affiliated with, endorsed by or sponsored by IFS. '
@@ -242,6 +258,11 @@ employers_n = len({j["company"] for j in jobs})
 MONTH = TODAY.strftime("%B %Y")
 country_links = lambda root: links([(c, cpath(c), n) for c, n in sorted(countries.items(), key=lambda x: -x[1])], root)
 area_links = lambda root: links([(a, apath(a), n) for a, n in sorted(areas.items(), key=lambda x: -x[1])], root)
+role_links = lambda root: links([(ROLE_SHORT[k], v[2], ROLE_N[k]) for k, v in ROLES.items()], root)
+mstrip = lambda root: (f'<a class="mstrip" href="{root}marketing-for-ifs-partners/"><span class="mk" aria-hidden="true">&nearr;</span>'
+                       f'<span class="mt"><span class="tk">For IFS partners</span><strong>Win more IFS deals. <em>Hire faster.</em></strong>'
+                       f'<span class="ms">Marketing built for IFS partners: leads by industry, LinkedIn, events and hiring.</span></span>'
+                       f'<span class="go">See how it works <i aria-hidden="true">&rarr;</i></span></a>')
 
 # ------------------------------------------------------------------ build
 if OUT.exists():
@@ -255,6 +276,8 @@ if (HERE / "logos").exists():
 # ---- home
 top3c = ", ".join(f"{c} ({n})" for c, n in by_country[:3])
 top3a = ", ".join(f"{a} ({n})" for a, n in by_area[:3])
+GUIDE_LINKS = [("guides/how-to-become-an-ifs-consultant/", "How to become an IFS consultant"), ("guides/ifs-certification/", "IFS certification explained"),
+               ("guides/ifs-skills-in-demand/", "IFS skills in demand")]
 home_faq, home_ld = faq([
     ("How many IFS jobs are open right now?", f"findifsjobs lists {N} open IFS jobs from {employers_n} employers as of {TODAY.strftime('%-d %B %Y')}. The list refreshes every day from public careers pages."),
     ("Which countries have the most IFS jobs?", f"The countries with the most open IFS roles are {top3c}."),
@@ -265,12 +288,14 @@ home_faq, home_ld = faq([
 stats = (f'<div class="stats"><span><b>{N}</b> open roles</span><span><b>{len(by_country)}</b> countries</span>'
          f'<span><b>{employers_n}</b> employers</span><span><b>{cloud_n}</b> on IFS Cloud</span></div>')
 search = '<div class="search"><input type="search" id="f-q" placeholder="Search by title, company, city or skill" aria-label="Search jobs"><button class="btn" type="button" id="f-go">Search</button></div>'
-home = (hero("The job board for the IFS ecosystem", "Find your next <em>IFS</em> job.",
-             "IFS Cloud, Apps 10, FSM and EAM roles from the vendor, partners, customers and recruiters. One list, every region.", sub=False, extra=search + stats)
+home = (hero("IFS consultant, developer and architect jobs", "Find your next <em>IFS</em> job.",
+             "Every open IFS consultant job in one list: IFS Cloud, Apps 10, FSM and EAM roles from the vendor, partners, customers and recruiters.", sub=False, extra=search + stats)
         + f'<div class="wrap"><div class="board">{filters(jobs)}<div class="list">{job_list(jobs, "")}</div>{extras("")}</div>'
+        + f'<section class="stack"><h2>IFS jobs by role</h2>{role_links("")}</section>'
         + f'<section class="stack"><h2>IFS jobs by country</h2>{country_links("")}</section>'
-        + f'<section class="stack"><h2>IFS jobs by module</h2>{area_links("")}</section>{home_faq}</div>')
-page("", f"IFS Jobs: {N} open IFS Cloud, ERP, EAM and FSM roles | findifsjobs",
+        + f'<section class="stack"><h2>IFS jobs by module</h2>{area_links("")}</section>'
+        + f'<section class="stack"><h2>IFS career guides</h2>{links([(t, p, None) for p, t in GUIDE_LINKS], "")}</section>{mstrip("")}{home_faq}</div>')
+page("", f"IFS Consultant Jobs: {N} open IFS Cloud, ERP, EAM and FSM jobs | findifsjobs",
      f"{N} open IFS jobs from {employers_n} employers in {len(by_country)} countries. IFS Cloud consultants, developers, architects and support roles, updated daily.",
      home, active="", priority="1.0",
      ld=[home_ld, {"@context": "https://schema.org", "@type": "WebSite", "name": "findifsjobs", "url": SITE + "/",
@@ -295,6 +320,7 @@ for j in jobs:
             + (f"The engagement is {j['contract_type'].lower()}. " if known(j.get("contract_type")) else "")
             + (f"Stated pay: {j['pay']}. " if j.get("pay") else ""))
     about = desc if generic or not j.get("summary") else f"{j['summary']} {desc}"
+    adv = (f'<h2>From the advert</h2><p>{e(j["excerpt"])}</p><p class="muted small">An extract from {e(j["company"])}\'s own posting. The full advert and the application form are on the original page.</p>') if j.get("excerpt") else ""
     partner = PBY.get(j["company"].lower())
     related = [x for x in jobs if x is not j and (x["company"] == j["company"] or x.get("area") == j.get("area"))][:5]
     side = (f'<div class="stack"><div class="note"><h3>About this listing</h3><p class="small">findifsjobs found this role on {e(j["company"])}\'s public careers page or advert. '
@@ -303,13 +329,13 @@ for j in jobs:
             + (f'<div class="note"><h3>More IFS jobs</h3>{links([(c, cpath(c), None) for c in [j.get("country")] if c in countries] + [(a, apath(a), None) for a in [j.get("area")] if a in areas] + [("All IFS jobs", "", None)], root)}</div>') + "</div>")
     body = (hero(j.get("company_type") or "IFS job", e(j["title"]), f'<b style="color:var(--ink);font-weight:500">{e(j["company"])}</b>{" · " + e(j["loc"]) if j["loc"] else ""}', h1cls="small",
                  extra=f'<a class="btn bigbtn" href="{e(j["url"])}" target="_blank" rel="noopener nofollow">Apply on the original posting &rarr;</a>')
-            + f'<div class="wrap"><div class="article"><div class="stack"><div class="prose"><h2>About the role</h2><p>{e(about)}</p></div>{table}'
+            + f'<div class="wrap"><div class="article"><div class="stack"><div class="prose"><h2>About the role</h2><p>{e(about)}</p>{adv}</div>{table}'
             + (f'<section class="stack"><h2>Similar IFS jobs</h2><ul class="rows">{"".join(job_row(x, root) for x in related)}</ul></section>' if related else "")
             + f'</div>{side}</div></div>')
     ld = []
     if known(j.get("country")):
         valid = (dt.date.fromisoformat((j.get("last_seen") or TODAY.isoformat())[:10]) + dt.timedelta(days=30)).isoformat()
-        jp = {"@context": "https://schema.org", "@type": "JobPosting", "title": j["title"], "description": f"<p>{e(about)}</p>",
+        jp = {"@context": "https://schema.org", "@type": "JobPosting", "title": j["title"], "description": f"<p>{e(about)}</p>" + (f"<p>{e(j['excerpt'])}</p>" if j.get("excerpt") else ""),
               "datePosted": j["when"][:10], "validThrough": valid, "directApply": False, "url": f"{SITE}/{j['path']}",
               "hiringOrganization": {"@type": "Organization", "name": j["company"], **({"sameAs": partner["web"]} if partner and partner.get("web") else {})},
               "jobLocation": {"@type": "Place", "address": {"@type": "PostalAddress", "addressCountry": j["country"],
@@ -331,6 +357,7 @@ def landing(path, h, lede, items, title, desc, qa, crumb):
     block, ld = faq(qa)
     body = (hero("IFS jobs", e(h), lede) + f'<div class="wrap"><div class="board">{filters(items, show=("area", "contract", "type") if "ifs-jobs/" in path and len({j.get("country") for j in items}) == 1 else ("country", "area", "contract", "type"))}'
             f'<div class="list">{job_list(items, "../../")}</div>{extras("../../")}</div>'
+            f'<section class="stack"><h2>IFS jobs by role</h2>{role_links("../../")}</section>'
             f'<section class="stack"><h2>IFS jobs by country</h2>{country_links("../../")}</section>'
             f'<section class="stack"><h2>IFS jobs by module</h2>{area_links("../../")}</section>{block}</div>')
     page(path, title, desc, body, ld=[ld], crumbs=[("IFS jobs", ""), (crumb, None)], priority="0.8")
@@ -350,8 +377,8 @@ for c, n in countries.items():
 for a, n in areas.items():
     items = [j for j in jobs if j.get("area") == a]
     cs = ", ".join(x for x, _ in Counter(j["country"] for j in items if known(j.get("country"))).most_common(3))
-    landing(apath(a), f"IFS {a} jobs", f"{plural(n, 'open IFS role')} in {e(a)}, updated daily.", items,
-            f"IFS {a} jobs: {plural(n, 'open role')} ({MONTH}) | findifsjobs",
+    landing(apath(a), AREA_H.get(a, f"IFS {a} jobs"), f"{plural(n, 'open IFS role')} in {e(a)}, updated daily.", items,
+            f"{AREA_H.get(a, f'IFS {a} jobs')}: {plural(n, 'open role')} ({MONTH}) | findifsjobs",
             f"{plural(n, 'open IFS job')} in {a}. Mostly in {cs}. Filter by country, contract type and employer.",
             [(f"How many IFS {a} jobs are open?", f"{plural(n, 'role')} as of {TODAY.strftime('%-d %B %Y')}."),
              (f"Where are IFS {a} jobs?", f"Most are in {cs}.")], f"{a} jobs")
@@ -360,13 +387,24 @@ for key, (h, test, path) in SPECIAL.items():
     if items:
         landing(path, h, f"{plural(len(items), 'open role')}, updated daily.", items, f"{h}: {plural(len(items), 'open role')} ({MONTH}) | findifsjobs",
                 f"{plural(len(items), 'open role')} on findifsjobs. {h} from IFS partners, customers and recruiters, refreshed daily.",
-                [(f"How many {h.lower()} are open?", f"{plural(len(items), 'role')} out of {N} IFS jobs listed, as of {TODAY.strftime('%-d %B %Y')}.")], h)
+                [(f"How many {h[0].lower() + h[1:] if not h.startswith('IFS') else h} are open?", f"{plural(len(items), 'role')} out of {N} IFS jobs listed, as of {TODAY.strftime('%-d %B %Y')}."),
+                 ("Who is hiring?", "The employers with the most of these roles are " + ", ".join(x for x, _ in Counter(j["company"] for j in items).most_common(3)) + "."),
+                 ("Where are these jobs?", "Mostly in " + (", ".join(x for x, _ in Counter(j["country"] for j in items if known(j.get("country"))).most_common(3)) or "several countries") + ".")], h)
 
 # ---- partners: directory and profiles
-mstrip = lambda root: (f'<a class="mstrip" href="{root}marketing-for-ifs-partners/"><span class="mk" aria-hidden="true">&nearr;</span>'
-                       f'<span class="mt"><span class="tk">For IFS partners</span><strong>Win more IFS deals. <em>Hire faster.</em></strong>'
-                       f'<span class="ms">Marketing built for IFS partners: leads by industry, LinkedIn, events and hiring.</span></span>'
-                       f'<span class="go">See how it works <i aria-hidden="true">&rarr;</i></span></a>')
+PC_RX = {"UK": r"\bUK\b|United Kingdom|England|Scotland", "USA": r"\bUSA\b|United States|Boston", "Canada": r"Canada|Ottawa", "Germany": "Germany", "Austria": "Austria",
+         "Sri Lanka": "Sri Lanka"}
+for _c in ("France", "India", "Netherlands", "Poland", "Saudi Arabia", "Japan", "Sweden", "Norway", "South Africa", "Indonesia", "Denmark", "Belgium", "Italy", "Australia", "Thailand"):
+    PC_RX[_c] = _c
+THE = {"UK": "the UK", "USA": "the USA", "Netherlands": "the Netherlands"}
+PCOUNTRY = {p["n"]: next((c for c, rx in PC_RX.items() if re.search(rx, p["hq"])), None) for p in partners}
+_pins = {n for n in PIN.values()}
+PC_PAGES = {}
+for _c in PC_RX:
+    _l = sorted((p for p in partners if re.search(PC_RX[_c], p["hq"])), key=lambda p: (p["n"] not in _pins, -p["score"], p["n"]))
+    if len(_l) >= 2:
+        PC_PAGES[_c] = _l
+PC_PAGES = dict(sorted(PC_PAGES.items(), key=lambda x: -len(x[1])))
 cells = ""
 for p in sorted(partners, key=lambda p: (-p["score"], p["n"])):
     text = " ".join(str(p.get(k) or "") for k in ("n", "hq", "focus", "blurb", "tier")).lower()
@@ -383,7 +421,7 @@ toolbar = ('<div class="toolbar"><input type="search" class="plain" id="p-q" pla
 page("partners/", f"IFS partner directory: {len(partners)} implementation partners | findifsjobs",
      f"{len(partners)} verified IFS partners across eight regions, with tier, size, focus and careers links. Sorted to surface emerging IFS specialists first.",
      hero("Partner directory", f"{len(partners)} IFS partners, emerging firms first", "Every firm is confirmed as an IFS partner by the IFS directory, an IFS announcement or an IFS event listing.")
-     + f'<div class="wrap">{toolbar}<p class="muted small" id="p-count">{len(partners)} of {len(partners)} partners</p><ul class="grid" id="p-list">{cells}</ul>{mstrip("../")}</div>',
+     + f'<div class="wrap">{toolbar}<p class="muted small" id="p-count">{len(partners)} of {len(partners)} partners</p><ul class="grid" id="p-list">{cells}</ul><section class="stack"><h2>IFS partners by country</h2>{links([(c, f"ifs-partners/{slug(c)}/", len(v)) for c, v in PC_PAGES.items()], "../")}</section>{mstrip("../")}</div>',
      active="partners/", crumbs=[("Partner directory", None)], priority="0.8")
 
 for p in partners:
@@ -392,6 +430,14 @@ for p in partners:
     facts = [("Headquarters", p["hq"]), ("IFS partner tier", p.get("tier")), ("Type", KIND[p["kind"]]), ("Size", p.get("size")), ("Founded", p.get("founded")),
              ("Focus", p["focus"]), ("IFS awards", p.get("awards")), ("Active in", ", ".join(REG[x][0] for x in p["r"]))]
     table = '<table class="facts">' + "".join(f"<tr><th>{e(k)}</th><td>{e(v)}</td></tr>" for k, v in facts if v) + "</table>"
+    pc = PCOUNTRY.get(p["n"])
+    bd = ""
+    if ranks:
+        br = ranks[0][0]
+        bcode = (f'<a href="{SITE}/top-ifs-partners/{REG[br][2]}/"><img src="{SITE}/badges/top-10-ifs-partner-{REG[br][2]}.svg" '
+                 f'alt="Top 10 IFS Partner {TODAY.year}, {REG[br][0]} - findifsjobs" width="220" height="82"></a>')
+        bd = (f'<div class="note"><h3>Show your ranking</h3><img class="badge" src="{root}badges/top-10-ifs-partner-{REG[br][2]}.svg" alt="Top 10 IFS Partner {TODAY.year}, {e(REG[br][0])}" width="220" height="82">'
+              f'<p class="small">Work at {e(p["n"])}? Paste this on your website or careers page.</p><textarea class="code" readonly rows="4" aria-label="Badge embed code" onclick="this.select()">{e(bcode)}</textarea></div>')
     rank_html = ('<div class="note"><h3>Rankings</h3><ul>' + "".join(f'<li><a href="{root}top-ifs-partners/{REG[r][2]}/">#{n} in {e(REG[r][0])}</a></li>' for r, n in ranks) + "</ul></div>") if ranks else ""
     pl = "".join(x for x in (ext(p.get("web"), "Website"), ext(p.get("careers"), "Careers page"), ext(p.get("src"), "Source for partner status")) if x)
     jobs_html = (f'<section class="stack"><h2>Open IFS jobs at {e(p["n"])}</h2><ul class="rows">{"".join(job_row(j, root) for j in p["jobs"])}</ul></section>' if p["jobs"]
@@ -400,7 +446,7 @@ for p in partners:
     body = (hero("IFS partner", f'<span class="pagelogo">{logo(p["n"], root, True)}<span>{e(p["n"])}</span></span>', e(p["blurb"]), h1cls="small")
             + f'<div class="wrap"><div class="article"><div class="stack">'
             + (f'<div class="prose"><h2>What stands out</h2><p>{e(p["sig"])}</p></div>' if p.get("sig") else "")
-            + f'{table}<div class="tags">{tags_for(p)}</div>{jobs_html}</div><div class="stack">{rank_html}<div class="note"><h3>Links</h3><div class="cell" style="border:0;padding:0;background:none"><div class="foot" style="border:0;padding:0;flex-direction:column">{pl}</div></div></div></div></div>{mstrip(root)}</div>')
+            + f'{table}<div class="tags">{tags_for(p)}</div>{jobs_html}</div><div class="stack">{rank_html}{bd}{f"""<div class="note"><h3>More partners</h3><a class="small" href="{root}ifs-partners/{slug(pc)}/">IFS partners in {e(THE.get(pc, pc))} &rarr;</a></div>""" if pc in PC_PAGES else ""}<div class="note"><h3>Links</h3><div class="cell" style="border:0;padding:0;background:none"><div class="foot" style="border:0;padding:0;flex-direction:column">{pl}</div></div></div></div></div>{mstrip(root)}</div>')
     page(p["path"], f"{p['n']}: IFS partner profile, jobs and facts | findifsjobs",
          f"{p['n']} is an IFS partner based in {p['hq']}. {p['blurb']} Tier, size, focus, awards and open IFS jobs.", body, active="partners/",
          ld=[{"@context": "https://schema.org", "@type": "Organization", "name": p["n"], **({"url": p["web"]} if p.get("web") else {}), "description": p["blurb"]}],
@@ -594,12 +640,12 @@ mk_form = ('<form class="form" data-kind="marketing enquiry" data-done="Got it. 
 mk_faq, mk_ld = faq([("Who is this for?", "IFS implementation, services and technology partners, and firms that sell to IFS customers. Small and mid-sized partners get the most from it."),
                      ("What do you do first?", "A short call, then a written plan: who to target, what to say, which channels, and what it should cost per qualified lead."),
                      ("Does working with you affect the partner rankings?", "No. The Top 10 lists and the directory are editorial and separate from any paid work.")])
-page("marketing-for-ifs-partners/", "Marketing for IFS partners: leads, LinkedIn, events and hiring | findifsjobs",
+page("marketing-for-ifs-partners/", "IFS partner marketing: leads, LinkedIn, events and hiring | findifsjobs",
      "Marketing services built for IFS partners: lead generation by IFS industry, LinkedIn and content, event marketing and employer brand, from the team behind findifsjobs.",
      hero("For IFS partners", "Marketing built for <em>IFS partners</em>", "Most agencies have to learn what IFS Cloud, FSM and EAM are before they can sell them. We already work in this ecosystem every day.")
      + f'<div class="wrap">{three([("Leads by IFS industry", "Campaigns aimed at the buyers IFS partners sell to: manufacturing, energy, aerospace, service and asset-heavy firms. Paid, outbound and landing pages, measured on qualified meetings."), ("LinkedIn and content", "A company page and consultant profiles that IFS buyers notice. Case studies, module explainers and upgrade content that rank in search and in AI answers."), ("Events and hiring", "Before, during and after IFS Connect and industry shows. Plus employer brand and featured roles on this board when you need consultants fast.")])}'
        f'<div class="prose"><h2>How it works</h2><p>You tell us the markets and the IFS industries you want to grow in. We come back with a plan and a fixed monthly scope. No long lock-in.</p></div>{mk_form}{mk_faq}</div>',
-     ld=[mk_ld], crumbs=[("Marketing for IFS partners", None)], priority="0.6")
+     active="marketing-for-ifs-partners/", ld=[mk_ld], crumbs=[("Marketing for IFS partners", None)], priority="0.7")
 page("about/", "About findifsjobs and how the data is collected",
      "findifsjobs is an independent job board and directory for the IFS ERP ecosystem. How jobs are collected, how partners are verified and how rankings work.",
      hero("About", "About findifsjobs", "An independent job board and directory for people who work with IFS Cloud, IFS Applications, FSM and EAM.")
@@ -612,10 +658,126 @@ page("about/", "About findifsjobs and how the data is collected",
 page("404.html", "Page not found | findifsjobs", "That page is not here.",
      hero("404", "That page isn't here", 'The job may have closed. <a href="/">See all open IFS jobs</a>.'), index=False)
 
+# ---- IFS partners by country
+def pcell(p, root):
+    return (f'<li class="cell"><div class="head">{logo(p["n"], root, True)}<div class="body"><h3><a href="{root}{p["path"]}" style="color:var(--ink)">{e(p["n"])}</a></h3><p class="meta">{e(p["hq"])}</p></div></div>'
+            f'<p class="sum">{e(p["blurb"])}</p><p class="kv"><b>Focus:</b> {e(p["focus"])}</p>'
+            + (f'<p class="kv"><b>Size:</b> {e(p["size"])}</p>' if p.get("size") else "")
+            + (f'<p class="kv"><b>Open IFS jobs:</b> {len(p["jobs"])}</p>' if p["jobs"] else "")
+            + f'<div class="tags">{tags_for(p)}</div>{btns(p, root)}</li>')
+
+
+for c, lst in PC_PAGES.items():
+    the = THE.get(c, c)
+    names = ", ".join(p["n"] for p in lst[:5])
+    spec = [p["n"] for p in lst if p["kind"] == "S"]
+    hiring = [p["n"] for p in lst if p["jobs"]]
+    block, fl = faq([(f"Who are the IFS partners in {the}?", f"findifsjobs lists {len(lst)} IFS partners headquartered in {the}: {', '.join(p['n'] for p in lst)}."),
+                     (f"Which IFS partners in {the} work only on IFS?", (", ".join(spec) + " focus only on IFS.") if spec else f"The partners listed in {the} work on IFS alongside other software."),
+                     (f"Which IFS partners in {the} are hiring?", (", ".join(hiring) + " have open IFS roles on the board today.") if hiring else "None of them has an open IFS role on the board today. Check each firm's careers page."),
+                     ("How do you know these firms are IFS partners?", "Each one is confirmed by the IFS partner directory, an IFS announcement or an IFS event listing. The source is linked on every profile.")])
+    il = {"@context": "https://schema.org", "@type": "ItemList", "name": f"IFS partners in {the}", "itemListElement": [
+        {"@type": "ListItem", "position": i + 1, "name": p["n"], "url": f"{SITE}/{p['path']}"} for i, p in enumerate(lst)]}
+    others = links([(k, f"ifs-partners/{slug(k)}/", len(v)) for k, v in PC_PAGES.items() if k != c], "../../")
+    page(f"ifs-partners/{slug(c)}/", f"IFS partners in {the}: {len(lst)} IFS implementation partners ({TODAY.year}) | findifsjobs",
+         f"{len(lst)} IFS implementation partners headquartered in {the}: {names}{' and more' if len(lst) > 5 else ''}. Focus, size, tier and open IFS jobs for each.",
+         hero("IFS implementation partners", f'IFS partners in <em>{e(the)}</em>', f"{len(lst)} verified IFS partners with their headquarters in {e(the)}. Firms based elsewhere that also deliver here are in the regional Top 10.")
+         + f'<div class="wrap"><ul class="grid">{"".join(pcell(p, "../../") for p in lst)}</ul>'
+           f'<section class="stack"><h2>IFS partners in other countries</h2>{others}</section>{mstrip("../../")}{block}</div>',
+         active="partners/", ld=[il, fl], crumbs=[("Partner directory", "partners/"), (f"IFS partners in {the}", None)], priority="0.8")
+page("ifs-partners/", f"IFS partners by country ({TODAY.year}) | findifsjobs",
+     f"IFS implementation partners by country: {', '.join(list(PC_PAGES)[:8])} and more. {len(partners)} verified partners in total.",
+     hero("IFS implementation partners", "IFS partners <em>by country</em>", f"{len(partners)} verified IFS partners, grouped by where they are headquartered.")
+     + f'<div class="wrap">{links([(f"IFS partners in {THE.get(c, c)}", f"ifs-partners/{slug(c)}/", len(v)) for c, v in PC_PAGES.items()], "../")}'
+       f'<section class="stack"><h2>Regional rankings</h2>{links([(f"Top 10 in {v[0]}", f"top-ifs-partners/{v[2]}/", None) for v in REG.values()], "../")}</section>{mstrip("../")}</div>',
+     active="partners/", crumbs=[("Partner directory", "partners/"), ("By country", None)], priority="0.7")
+
+# ---- badges for ranked partners
+(OUT / "badges").mkdir(exist_ok=True)
+for r, (short, long, rs) in REG.items():
+    (OUT / "badges" / f"top-10-ifs-partner-{rs}.svg").write_text(
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="440" height="164" viewBox="0 0 440 164" role="img" aria-label="Top 10 IFS Partner {TODAY.year}, {e(short)}">'
+        f'<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#23114F"/><stop offset="1" stop-color="#5B2BBF"/></linearGradient></defs>'
+        f'<rect width="440" height="164" rx="22" fill="url(#g)"/><text x="30" y="118" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-size="104" fill="#fff" fill-opacity=".16">10</text>'
+        f'<g font-family="Arial,Helvetica,sans-serif" fill="#fff"><text x="170" y="52" font-size="15" font-weight="700" letter-spacing="2.5" fill="#CDB9F7">TOP 10 IFS PARTNER</text>'
+        f'<text x="170" y="92" font-size="{30 if len(short) < 15 else 23}" font-weight="800">{e(short)}</text>'
+        f'<text x="170" y="124" font-size="15" fill="#CDB9F7">{TODAY.year} ranking · findifsjobs.com</text></g></svg>', encoding="utf-8")
+
+# ---- guides
+role_mix = [(ROLE_SHORT[k], ROLE_N[k]) for k in ROLES]
+pct = lambda n: f"{round(100 * n / N)}%" if N else "0%"
+srcs = lambda items: '<h2>Sources</h2><ul>' + "".join(f'<li>{ext(u, e(t))}</li>' for t, u in items) + "</ul>"
+top_areas = ", ".join(f"{a} ({n})" for a, n in by_area[:5])
+G1_FAQ = [("Do I need to code to be an IFS consultant?", "No for functional roles, which are about business processes and configuration. Yes for technical roles, where PL/SQL and integration skills are the core of the job."),
+          ("Is IFS Cloud experience required?", f"{cloud_n} of the {N} open IFS jobs on findifsjobs name IFS Cloud. Experience on Apps 9 or Apps 10 still counts, especially for upgrade projects."),
+          ("Which IFS module should I learn first?", f"Start with the one closest to your background. By open roles today, the busiest areas are {top3a}."),
+          ("Can IFS consultants work remotely?", f"Often. {remote_n} of {N} open roles are remote or hybrid.")]
+g1_faq, g1_ld = faq(G1_FAQ)
+G1 = (f'<div class="prose"><p class="answer"><b>Short answer.</b> Pick a track (functional or technical), build on a business area you already know, get hands-on with IFS Cloud through an employer that runs or implements it, '
+      f'then prove it with an IFS Certified Practitioner exam. Most people get in through an IFS partner, the internal team of a company that runs IFS, or IFS itself.</p>'
+      f'<h2>1. Choose a track</h2><p><b>Functional consultants</b> map how a business works onto IFS: they run workshops, configure the system, test and train users. They specialise by area, such as finance, supply chain, manufacturing, maintenance, projects, HCM or field service.</p>'
+      f'<p><b>Technical consultants and developers</b> build what configuration cannot: customisations, integrations, data migration and reports. The usual toolkit is PL/SQL on Oracle, IFS Developer Studio, projections and client files, REST and OData APIs, IFS Connect, lobbies and workflows.</p>'
+      f'<p>Later paths include solution architect and project manager. On the board today: {", ".join(f"{n} {t.lower()} roles" for t, n in role_mix)}.</p>'
+      f'<h2>2. Start from what you know</h2><p>IFS employers hire for domain knowledge first. An accountant becomes a finance consultant faster than a generalist does. A maintenance planner already speaks the language of IFS EAM. Use your current field as the entry point and add the system on top.</p>'
+      f'<h2>3. Get access to the system</h2><p>You cannot learn IFS well without an environment, and that almost always comes from an employer. Three routes work:</p>'
+      f'<ul><li><b>Join an IFS partner</b> in a junior, graduate or support role. Partners train people because they need certified consultants. See the <a href="../../partners/">partner directory</a>.</li>'
+      f'<li><b>Become the key user</b> where your company runs IFS. Many consultants started as the super user on their own employer\'s project.</li>'
+      f'<li><b>Start in support.</b> Application support exposes you to every module and to real problems. See <a href="../../{ROLES["support"][2] if "support" in ROLES else ""}">IFS support jobs</a>.</li></ul>'
+      f'<h2>4. Get certified</h2><p>IFS Academy runs the IFS Certified Practitioner exams, one per product area. It is the clearest signal for someone early in their IFS career. Details are in the <a href="../ifs-certification/">IFS certification guide</a>.</p>'
+      f'<h2>5. Apply where the demand is</h2><p>As of {TODAY.strftime("%-d %B %Y")} the board lists {N} open IFS jobs from {employers_n} employers. The countries with the most roles are {top3c}. '
+      f'Browse <a href="../../ifs-jobs/functional-consultant/">functional</a> or <a href="../../{ROLES["technical"][2] if "technical" in ROLES else ""}">technical</a> roles, or see <a href="../ifs-skills-in-demand/">which skills are in demand</a>.</p></div>')
+G2_FAQ = [("What is IFS certification?", "A credential from IFS Academy that shows you know a product area of IFS Cloud. The main one is IFS Certified Practitioner, issued per area such as Finance, Supply Chain, Manufacturing, Projects, Maintenance or HCM."),
+          ("How do you get IFS certified?", "You pass an exam for your product area. The Finance Consultant exam, for example, has 60 questions and a 70% pass mark according to its Credly badge page. Certification is then kept current through annual recertification."),
+          ("Who can take IFS Academy training?", "IFS publishes its Academy programme for partners, with registration through the partner learning portal. If you work for an IFS customer or independently, ask IFS Academy what is open to you."),
+          ("Is this the same as IFS food safety certification?", "No. IFS Food and other International Featured Standards audits are a separate organisation and have nothing to do with IFS the software company.")]
+g2_faq, g2_ld = faq(G2_FAQ)
+G2 = (f'<div class="prose"><p class="answer"><b>Short answer.</b> IFS certification is run by IFS Academy. The main credential is <b>IFS Certified Practitioner</b>, awarded per product area of IFS Cloud. You earn it by passing an exam and keep it through annual recertification. Badges are issued through Credly.</p>'
+      f'<h2>The certifications</h2><p>Practitioner certifications exist for consultants in Finance, Supply Chain, Manufacturing, Projects, Maintenance and Human Capital Management, plus a Presales Consultant track. Each one attests to an in-depth understanding of that part of IFS Cloud and a good understanding of the overall solution.</p>'
+      f'<p>IFS describes its product-based pathway as moving from Practitioner to Expert, supported by digital learning paths, specialist workshops and classroom training for functional and technical roles.</p>'
+      f'<h2>The exam</h2><p>Using Finance Consultant (IFS Cloud) as the example: 60 questions, 70% to pass. It covers General Ledger, Accounts Receivable and Accounts Payable. Holders recertify each year as new IFS Cloud releases change the product.</p>'
+      f'<h2>How to get access</h2><p>IFS Academy for Partners is aimed at IFS partner staff, who register through the partner learning portal. That is one reason joining a partner is the common way in. If you work at an IFS customer or as a freelancer, contact IFS Academy and ask which courses and exams are open to you.</p>'
+      f'<h2>Is it worth it?</h2><p>It helps most early on, when you have little project history to point to, and when moving from Apps 9 or 10 to IFS Cloud. For senior roles, employers weigh completed implementations more heavily than badges. {cloud_n} of the {N} roles on the board today name IFS Cloud, so Cloud-specific proof is useful either way.</p>'
+      f'<h2>Not the food standard</h2><p>Searches for "IFS certification" also return IFS Food and other International Featured Standards audits. Those are unrelated to IFS, the enterprise software company.</p>'
+      + srcs([("IFS Academy for Partners (ifs.com)", "https://www.ifs.com/en/partners/academy"),
+              ("IFS Certified Practitioner, Finance Consultant (Credly)", "https://www.credly.com/org/ifs/badge/ifs-certified-practitioner-financials-consultant-ifs-cloud"),
+              ("IFS badges on Credly", "https://www.credly.com/org/ifs")]) + "</div>")
+G3_FAQ = [("Which IFS skills are most in demand?", f"By open roles on findifsjobs in {MONTH}, the busiest areas are {top_areas}."),
+          ("How many IFS jobs ask for IFS Cloud?", f"{cloud_n} of {N} ({pct(cloud_n)}) name IFS Cloud."),
+          ("Are functional or technical IFS skills wanted more?", "By job title: " + ", ".join(f"{t.lower()} {n}" for t, n in role_mix) + "."),
+          ("Where is demand for IFS skills highest?", f"The countries with the most open roles are {top3c}.")]
+g3_faq, g3_ld = faq(G3_FAQ)
+G3 = (f'<div class="prose"><p class="answer"><b>Short answer.</b> In {MONTH}, the IFS skills employers ask for most are {top_areas}. {cloud_n} of {N} open roles ({pct(cloud_n)}) name IFS Cloud. The figures come from the {N} live jobs on this board and update daily.</p>'
+      f'<h2>Demand by module</h2></div>{tbl("Open roles by module or area", by_area)}<div class="prose"><h2>Demand by role</h2><p>Counted from job titles. A role can fall into more than one group, and some fall into none.</p></div>'
+      f'{tbl("Open roles by type", role_mix)}<div class="prose"><h2>Where the demand is</h2></div>{tbl("Open roles by country", by_country[:10])}'
+      f'<div class="prose"><h2>What this means for you</h2><ul><li><b>IFS Cloud is the baseline.</b> If your experience is on Apps 9 or 10, get on an upgrade project or take a Cloud certification.</li>'
+      f'<li><b>Depth in one module beats a little of everything.</b> Adverts are written by module.</li>'
+      f'<li><b>Remote is normal.</b> {remote_n} of {N} roles ({pct(remote_n)}) are remote or hybrid.</li></ul>'
+      f'<p>The full breakdown, with charts, is in the <a href="../../ifs-hiring-report/">IFS hiring report</a>.</p></div>')
+GUIDES = [("how-to-become-an-ifs-consultant", "How to become an IFS consultant", "The routes into IFS consulting: functional and technical tracks, how to get system access, certification and where the jobs are.", G1, g1_faq, g1_ld),
+          ("ifs-certification", "IFS certification explained", "What IFS Certified Practitioner is, the tracks, the exam, who can access IFS Academy and whether it is worth it.", G2, g2_faq, g2_ld),
+          ("ifs-skills-in-demand", f"IFS skills in demand ({MONTH})", f"Which IFS modules, roles and countries have the most open jobs in {MONTH}, from {N} live listings.", G3, g3_faq, g3_ld)]
+for gs, gt, gd, gb, gf, gl in GUIDES:
+    more = links([(t, f"guides/{x}/", None) for x, t, *_ in GUIDES if x != gs] + [("All open IFS jobs", "", None)], "../../")
+    page(f"guides/{gs}/", f"{gt} | findifsjobs", gd,
+         hero("IFS career guide", e(gt), f'{e(gd)} Updated {TODAY.strftime("%-d %B %Y")}.', h1cls="small")
+         + f'<div class="wrap"><div class="stack">{gb}{gf}<section class="stack"><h2>Keep reading</h2>{more}</section></div></div>',
+         ld=[gl, {"@context": "https://schema.org", "@type": "Article", "headline": gt, "description": gd, "dateModified": TODAY.isoformat(), "datePublished": "2026-10-10",
+                  "author": {"@type": "Organization", "name": "findifsjobs"}, "publisher": {"@type": "Organization", "name": "findifsjobs"}}],
+         active="-", crumbs=[("Guides", "guides/"), (gt, None)], priority="0.8")
+page("guides/", "IFS career guides: getting in, certification and skills | findifsjobs",
+     "Plain guides for people building a career in IFS: how to become an IFS consultant, how IFS certification works and which IFS skills are in demand.",
+     hero("Guides", "IFS career <em>guides</em>", "Short, practical answers for people working in or moving into IFS.")
+     + '<div class="wrap"><ul class="grid">' + "".join(f'<li class="cell"><h3><a href="{gs}/" style="color:var(--ink)">{e(gt)}</a></h3><p class="sum">{e(gd)}</p><div class="btns"><a class="pbtn primary" href="{gs}/">Read the guide<span aria-hidden="true">&rarr;</span></a></div></li>' for gs, gt, gd, *_ in GUIDES) + "</ul></div>",
+     active="-", crumbs=[("Guides", None)], priority="0.7")
+
 # ---- sitemap, robots, llms.txt
 (OUT / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(
     f"<url><loc>{SITE}/{p}</loc><lastmod>{m}</lastmod><priority>{pr}</priority></url>\n" for p, m, pr in PAGES) + "</urlset>\n", encoding="utf-8")
-(OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n", encoding="utf-8")
+BOTS = ["Googlebot", "Bingbot", "GPTBot", "OAI-SearchBot", "ChatGPT-User", "PerplexityBot", "ClaudeBot", "Claude-SearchBot", "Google-Extended", "Applebot-Extended", "CCBot"]
+(OUT / "robots.txt").write_text("User-agent: *\nAllow: /\n\n" + "".join(f"User-agent: {b}\nAllow: /\n\n" for b in BOTS) + f"Sitemap: {SITE}/sitemap.xml\n", encoding="utf-8")
+if CFG.get("indexnow_key"):
+    (OUT / f"{CFG['indexnow_key']}.txt").write_text(CFG["indexnow_key"], encoding="utf-8")
+(HERE / "urls.txt").write_text("\n".join(f"{SITE}/{p}" for p, _, _ in PAGES) + "\n", encoding="utf-8")
 llms = [f"# findifsjobs", "", f"> Independent job board and directory for the IFS ERP ecosystem (IFS Cloud, IFS Applications, FSM, EAM). Not affiliated with IFS. Updated daily; last update {TODAY.isoformat()}.", "",
         "## Key facts", f"- {rep_summary}", f"- {len(partners)} verified IFS partners and {len(recruiters)} recruiters are listed.", "",
         "## Main pages", f"- [All open IFS jobs]({SITE}/): {N} roles, filterable by country, module, contract and employer type",
@@ -623,6 +785,10 @@ llms = [f"# findifsjobs", "", f"> Independent job board and directory for the IF
         f"- [Top 10 IFS partners by region]({SITE}/top-ifs-partners/): eight regional rankings with the scoring method",
         f"- [IFS partner directory]({SITE}/partners/): tier, size, focus and careers links for each partner",
         f"- [IFS recruiters]({SITE}/ifs-recruiters/): specialist IFS recruitment firms",
+        f"- [IFS partners by country]({SITE}/ifs-partners/): " + ", ".join(f"{c} ({len(v)})" for c, v in PC_PAGES.items()),
+        f"- [How to become an IFS consultant]({SITE}/guides/how-to-become-an-ifs-consultant/)", f"- [IFS certification explained]({SITE}/guides/ifs-certification/)",
+        f"- [IFS skills in demand]({SITE}/guides/ifs-skills-in-demand/): " + G3_FAQ[0][1],
+        f"- [Marketing for IFS partners]({SITE}/marketing-for-ifs-partners/): lead generation, LinkedIn, events and hiring marketing for IFS partner firms",
         f"- [What's new in IFS]({SITE}/news/): sourced news on releases, partners and customers",
         f"- [About and method]({SITE}/about/): how jobs are collected and partners verified", "", "## Top 10 IFS partners by region"]
 llms += [f"- [{v[1][0].upper() + v[1][1:]}]({SITE}/top-ifs-partners/{v[2]}/): " + ", ".join(p["n"] for p in top10[k]) for k, v in REG.items()]
