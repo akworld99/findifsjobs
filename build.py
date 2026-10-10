@@ -363,8 +363,10 @@ for key, (h, test, path) in SPECIAL.items():
                 [(f"How many {h.lower()} are open?", f"{plural(len(items), 'role')} out of {N} IFS jobs listed, as of {TODAY.strftime('%-d %B %Y')}.")], h)
 
 # ---- partners: directory and profiles
-mstrip = lambda root: (f'<a class="mstrip" href="{root}marketing-for-ifs-partners/"><span><b>Run an IFS partner firm?</b> We help partners fill their pipeline and their hiring funnel.</span>'
-                       f'<span class="go">Marketing for IFS partners <i aria-hidden="true">&rarr;</i></span></a>')
+mstrip = lambda root: (f'<a class="mstrip" href="{root}marketing-for-ifs-partners/"><span class="mk" aria-hidden="true">&nearr;</span>'
+                       f'<span class="mt"><span class="tk">For IFS partners</span><strong>Win more IFS deals. <em>Hire faster.</em></strong>'
+                       f'<span class="ms">Marketing built for IFS partners: leads by industry, LinkedIn, events and hiring.</span></span>'
+                       f'<span class="go">See how it works <i aria-hidden="true">&rarr;</i></span></a>')
 cells = ""
 for p in sorted(partners, key=lambda p: (-p["score"], p["n"])):
     text = " ".join(str(p.get(k) or "") for k in ("n", "hq", "focus", "blurb", "tier")).lower()
