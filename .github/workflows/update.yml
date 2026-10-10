@@ -42,12 +42,8 @@ jobs:
       - name: Fetch company logos
         run: pip install -q pillow && python fetch_logos.py || echo "Logo fetch had problems, building with what we have"
 
-      - name: Build the page
-        run: |
-          python build.py
-          mkdir -p site
-          cp index.html site/
-          [ -d logos ] && cp -r logos site/ || true
+      - name: Build the site
+        run: python build.py
 
       - name: Save the refreshed job list
         run: |
