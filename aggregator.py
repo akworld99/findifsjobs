@@ -41,7 +41,8 @@ HERE = Path(__file__).resolve().parent
 OUT = HERE / "jobs.json"
 TODAY = dt.date.today().isoformat()
 EXPIRE_DAYS = 30          # drop a job this long after it was last seen in a feed
-UA = "findifsjobs-aggregator/0.1 (+https://findifsjobs.com)"
+UA = "Mozilla/5.0 (compatible; findifsjobs/0.1; +https://findifsjobs.com)"
+REPORT = []   # one line per source, written to last_run.txt so a run can be checked without opening the log
 
 # kind, id, display name, employer type, mode
 # mode True     -> the firm only does IFS work: keep every consulting-type role
@@ -367,6 +368,10 @@ def fetch_html(url, name, ctype, ifs_only):
             continue
         seen.add(title.lower())
         out.append(make_job(title, name, ctype, None, guess_country(title), full))
+    if not out:   # leave a trail so the page can be diagnosed
+        links = LINK.findall(page)
+        cand = [(urllib.parse.urljoin(url, h), strip_html(t)[:60]) for h, t in links if JOB_PATH.search(urllib.parse.urljoin(url, h))]
+        REPORT.append(f"    {name}: page {len(page)} chars, {len(links)} links, {len(cand)} job-like; sample {cand[:6]}")
     return out
 
 
@@ -429,10 +434,12 @@ def main():
         try:
             got = FETCHERS[kind](ident, name, ctype, ifs_only)
             print(f"{name:<18}{kind:<16}{len(got):>4} IFS jobs")
+            REPORT.append(f"{name:<22}{kind:<16}{len(got):>4} jobs")
             fresh += got
         except Exception as e:               # one broken feed must not stop the run
             failed.append(name)
             print(f"{name:<18}{kind:<16}FAILED  {e}")
+            REPORT.append(f"{name:<22}{kind:<16}FAILED  {str(e)[:120]}")
     try:
         got = fetch_adzuna()
         print(f"{'Adzuna':<18}{'api':<16}{len(got):>4} IFS jobs" if got else "Adzuna            skipped (no API keys set)")
@@ -442,6 +449,7 @@ def main():
         print(f"Adzuna            FAILED  {e}")
     merged = merge(existing, fresh)
     OUT.write_text(json.dumps(merged, ensure_ascii=False, indent=1), encoding="utf-8")
+    (HERE / "last_run.txt").write_text(f"Run {dt.datetime.utcnow():%Y-%m-%d %H:%M} UTC, {len(merged)} jobs on the board\n\n" + "\n".join(REPORT) + "\n", encoding="utf-8")
     print(f"\n{len(merged)} jobs in {OUT.name} ({len(fresh)} fetched this run, {len(failed)} sources failed)")
     return 1 if failed and not fresh else 0
 

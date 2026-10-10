@@ -8,7 +8,7 @@ on:
   workflow_dispatch:        # lets you press "Run workflow" by hand
   push:
     branches: [main]
-    paths-ignore: ["jobs.json"]   # the bot's own data commit must not trigger another run
+    paths-ignore: ["jobs.json", "last_run.txt"]   # the bot's own data commit must not trigger another run
 
 permissions:
   contents: write   # commit the refreshed jobs.json
@@ -50,7 +50,7 @@ jobs:
         run: |
           git config user.name "findifsjobs-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add jobs.json
+          git add jobs.json last_run.txt
           git diff --cached --quiet || git commit -m "Daily job refresh"
           git push
 
