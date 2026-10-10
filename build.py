@@ -10,7 +10,7 @@ dump = lambda d: json.dumps(d, ensure_ascii=False).replace("</", "<\\/")
 
 jobs = load("jobs.json")
 keep = ["title", "company", "company_type", "city", "country", "region", "work_mode", "contract_type",
-        "area", "seniority", "ifs_version", "pay", "posted", "url", "summary"]
+        "area", "seniority", "ifs_version", "pay", "posted", "first_seen", "url", "summary"]
 jobs = [{k: j.get(k) for k in keep} for j in jobs if str(j.get("url", "")).startswith("https://")]
 
 
@@ -28,12 +28,11 @@ partners = load("partners.json")
 for p in partners:
     p["score"] = score(p)
 recruiters = load("recruiters.json")
+news = load("news.json") if (here / "news.json").exists() else []
+freelancers = load("freelancers.json") if (here / "freelancers.json").exists() else []
 
 page = (here / "template.html").read_text(encoding="utf-8")
 page = page.replace("/*JOBS*/[]", dump(jobs)).replace("/*PARTNERS*/[]", dump(partners)).replace("/*RECRUITERS*/[]", dump(recruiters))
+page = page.replace("/*NEWS*/[]", dump(news)).replace("/*FREELANCERS*/[]", dump(freelancers))
 (here / "index.html").write_text(page, encoding="utf-8")
 print(f"index.html built: {len(jobs)} jobs, {len(partners)} partners, {len(recruiters)} recruiters")
-if __name__ == "__main__":
-    for r in ["NA", "UK", "NORD", "DACH", "EU", "MEA", "SA", "APAC"]:
-        top = sorted((p for p in partners if r in p["r"]), key=lambda p: (-(p["score"] + 3 * (p.get("home") == r)), p["n"]))
-        print(r, len(top), " | ".join(f"{p['n']} {p['score'] + 3 * (p.get('home') == r):g}" for p in top[:10]))

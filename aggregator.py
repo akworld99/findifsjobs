@@ -95,7 +95,8 @@ ROLE_WORDS = re.compile(
 
 VENDOR_ROLES = re.compile(
     r"\bIFS\b|consultant|implementation|solution architect|solutions architect|presales|pre-sales|"
-    r"\bEAM\b|\bFSM\b|\bERP\b|project manager|customer success|business analyst", re.I)
+    r"\bEAM\b|\bFSM\b|\bERP\b|project manager|customer success|business analyst|"
+    r"support (engineer|analyst|specialist|consultant)|application support|technical consultant", re.I)
 VENDOR_SKIP = re.compile(
     r"software engineer|full stack|security|legal|credit|treasury|IT support|platform engineer|applied ai|"
     r"copperleaf|loops|recruit|marketing|finance systems|payroll|talent", re.I)
