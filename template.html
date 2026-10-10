@@ -1,0 +1,369 @@
+<title>Find IFS Jobs</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: white sticky nav, deep-purple hero band with the search, then a filter rail beside one long column of job cards. Partner and recruiter pages reuse the same card. Light page, purple brand, by request. */
+:root{
+  --bg:#FAF8FE; --surface:#FFFFFF; --ink:#1A0B2E; --muted:#5F5673; --line:#E6DDF3;
+  --brand:#6A1FD0; --brand-deep:#2B0B55; --brand-mid:#4A14A0; --tint:#F1E8FD; --pink:#D92E93; --pink-bg:#FDE9F4; --on-dark:#FFFFFF; --on-dark-muted:#D5C6EE;
+  --font:"Poppins","Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+  --r:16px; --shadow:0 1px 2px rgba(43,11,85,.06),0 8px 24px rgba(43,11,85,.06);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;margin:0}
+a{color:var(--brand);font-weight:600;text-decoration:none}
+a:hover{text-decoration:underline}
+:is(a,button,input,select,summary):focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-weight:800;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.02em}
+h1{font-size:clamp(2.1rem,5.4vw,3.7rem)}
+h2{font-size:clamp(1.6rem,3.4vw,2.4rem)}
+h3{font-size:1.08rem;font-weight:700;letter-spacing:-.01em}
+p{margin:0}
+.eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--brand)}
+.muted{color:var(--muted)} .small{font-size:.86rem}
+
+/* nav */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--surface);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:8px 22px;flex-wrap:wrap;padding-block:12px}
+.brand{font-weight:800;font-size:1.25rem;color:var(--ink);letter-spacing:-.02em;white-space:nowrap}
+.brand:hover{text-decoration:none}
+.brand i{font-style:normal;color:var(--brand)}
+.tabs{display:flex;gap:2px;flex:1;min-width:0}
+.tabs a{color:var(--ink);font-weight:600;font-size:.94rem;padding:8px 13px;border-radius:999px;white-space:nowrap}
+.tabs a:hover{background:var(--tint);text-decoration:none}
+.tabs a[aria-current="page"]{background:var(--tint);color:var(--brand)}
+.btn{display:inline-block;background:var(--brand);color:var(--on-dark);border:0;border-radius:999px;padding:11px 22px;font:700 .94rem var(--font);cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--brand-mid);text-decoration:none}
+.btn.ghost{background:transparent;color:var(--brand);box-shadow:inset 0 0 0 2px var(--brand)}
+.btn.ghost:hover{background:var(--tint)}
+.btn.light{background:var(--on-dark);color:var(--brand-deep)}
+@media(max-width:900px){.tabs{order:3;flex:1 0 100%;overflow-x:auto;scrollbar-width:none}.top .wrap{justify-content:space-between}}
+
+/* hero */
+.hero{background:radial-gradient(900px 420px at 85% -10%,#7B2FE0 0,transparent 60%),radial-gradient(700px 380px at 0% 110%,#A0288F 0,transparent 55%),var(--brand-deep);color:var(--on-dark)}
+.hero .wrap{padding-block:56px 48px;display:flex;flex-direction:column;gap:20px}
+.hero .eyebrow{color:#E7B8FF}
+.hero p.lede{font-size:1.12rem;max-width:58ch;color:var(--on-dark-muted)}
+.hero h1 em{font-style:normal;color:#E7B8FF}
+.search{display:flex;gap:8px;background:var(--surface);border-radius:999px;padding:7px;max-width:720px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.search input{flex:1;min-width:0;border:0;background:transparent;font:500 1.02rem var(--font);color:var(--ink);padding:8px 16px;outline:none}
+.stats{display:flex;flex-wrap:wrap;gap:6px 26px;font-weight:500;color:var(--on-dark-muted)}
+.stats b{color:var(--on-dark);font-weight:800;font-size:1.25rem;font-variant-numeric:tabular-nums}
+.sub{background:var(--brand-deep);color:var(--on-dark)}
+.sub .wrap{padding-block:44px 40px;display:flex;flex-direction:column;gap:12px}
+.sub .eyebrow{color:#E7B8FF}.sub p{color:var(--on-dark-muted);max-width:66ch;font-size:1.05rem}
+
+main .wrap{padding-block:32px 72px}
+section.view>.wrap{display:flex;flex-direction:column;gap:24px}
+
+/* jobs layout */
+.board{display:grid;grid-template-columns:270px minmax(0,1fr);gap:28px;align-items:start}
+.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 84px);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:14px}
+.rail label{display:flex;flex-direction:column;gap:5px;font-size:.76rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+select,input[type=text],input[type=email],input[type=search].plain{font:500 .97rem var(--font);color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:10px 11px;width:100%;min-width:0}
+select:hover,input:hover{border-color:var(--brand)}
+.check{flex-direction:row!important;align-items:center;gap:9px!important;text-transform:none!important;letter-spacing:0!important;font-size:.93rem!important;color:var(--ink)!important;font-weight:600!important}
+.check input{accent-color:var(--brand);width:17px;height:17px}
+.linkbtn{background:none;border:0;color:var(--brand);font:600 .9rem var(--font);cursor:pointer;padding:0;text-align:left}
+.listhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+@media(max-width:900px){.board{grid-template-columns:1fr}.rail{position:static;display:grid;grid-template-columns:1fr 1fr}.rail .wide{grid-column:1/-1}}
+
+.cards{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:6px 16px;align-items:start}
+@media(prefers-reduced-motion:no-preference){.card{transition:box-shadow .18s,border-color .18s,transform .18s}}
+.card:hover{border-color:#CDB6F0;box-shadow:var(--shadow)}
+.card h3 a{color:var(--ink)}
+.card h3 a:hover{color:var(--brand);text-decoration:none}
+.who{font-weight:600;font-size:.95rem}.who span{color:var(--muted);font-weight:500}
+.sum{color:var(--muted);font-size:.92rem;max-width:68ch}
+.body{display:flex;flex-direction:column;gap:5px;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:3px}
+.chip{font-size:.75rem;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--bg);border:1px solid var(--line);white-space:nowrap}
+.chip.v{background:var(--tint);border-color:var(--tint);color:var(--brand-mid)}
+.chip.e{background:var(--pink-bg);border-color:var(--pink-bg);color:var(--pink)}
+.side{display:flex;flex-direction:column;gap:8px;align-items:flex-end;text-align:right}
+.pay{font-weight:800;color:var(--brand-mid);font-variant-numeric:tabular-nums;font-size:.98rem}
+.date{font-size:.8rem;color:var(--muted)}
+.btn.sm{padding:8px 16px;font-size:.86rem}
+@media(max-width:640px){.card{grid-template-columns:44px minmax(0,1fr)}.side{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;text-align:left}}
+.empty{padding:28px;font-weight:600;background:var(--surface);border:1px dashed var(--line);border-radius:var(--r)}
+
+/* logo tile */
+.logo{position:relative;width:52px;height:52px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:1rem;color:var(--on-dark);background:var(--lg,var(--brand));overflow:hidden;flex:none;letter-spacing:0}
+.logo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:var(--surface);padding:5px;border:1px solid var(--line);border-radius:12px}
+@media(max-width:640px){.logo{width:44px;height:44px;font-size:.9rem}}
+
+/* top 10 */
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{font:600 .9rem var(--font);padding:9px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.pill:hover{border-color:var(--brand)}
+.pill[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--on-dark)}
+.rank{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:r}
+.rank .card{grid-template-columns:44px 52px minmax(0,1fr) auto;counter-increment:r}
+.rank .card::before{content:counter(r);font-weight:800;font-size:1.7rem;color:var(--brand);line-height:52px;text-align:center;font-variant-numeric:tabular-nums}
+.rank .card:nth-child(-n+3){border-color:#CDB6F0}
+.links{display:flex;gap:6px 16px;flex-wrap:wrap;font-size:.86rem;justify-content:flex-end}
+@media(max-width:640px){.rank .card{grid-template-columns:30px 44px minmax(0,1fr)}.rank .card::before{font-size:1.3rem;line-height:44px}.links{justify-content:flex-start}}
+.method{background:var(--tint);border-radius:var(--r);padding:16px 20px;font-size:.9rem;color:var(--brand-deep)}
+
+/* grid cards */
+.toolbar{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px}
+@media(max-width:760px){.toolbar{grid-template-columns:1fr 1fr}.toolbar :first-child{grid-column:1/-1}}
+.grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.grid .card{grid-template-columns:52px minmax(0,1fr);align-content:start}
+.grid .card .foot{grid-column:1/-1;display:flex;gap:6px 16px;flex-wrap:wrap;font-size:.86rem;border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
+.kv{font-size:.84rem;color:var(--muted)}.kv b{color:var(--ink);font-weight:600}
+
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+.form label{display:flex;flex-direction:column;gap:5px;font-size:.84rem;font-weight:600;min-width:0}
+.form .full{grid-column:1/-1}
+@media(max-width:560px){.form{grid-template-columns:1fr}}
+.msg{font-weight:600;color:var(--brand-deep);background:var(--tint);border-radius:10px;padding:10px 12px}
+.three{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.three>div{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:8px}
+
+footer{background:var(--brand-deep);color:var(--on-dark-muted);font-size:.86rem}
+footer .wrap{padding-block:40px 44px;display:flex;flex-direction:column;gap:22px}
+footer h2{color:var(--on-dark);font-size:1.5rem}
+footer a{color:#E7B8FF}
+.news{display:flex;gap:8px;flex-wrap:wrap;max-width:560px}
+.news input{flex:1 1 220px;border-radius:999px;border:0;padding:12px 18px;font:500 1rem var(--font);min-width:0}
+</style>
+
+<header class="top"><div class="wrap">
+  <a class="brand" href="#jobs" data-nav="jobs">find<i>ifs</i>jobs</a>
+  <nav class="tabs" aria-label="Sections">
+    <a href="#jobs" data-nav="jobs">Jobs</a>
+    <a href="#top10" data-nav="top10">Top 10 partners</a>
+    <a href="#partners" data-nav="partners">Partner directory</a>
+    <a href="#recruiters" data-nav="recruiters">IFS recruiters</a>
+  </nav>
+  <a class="btn" href="#employers" data-nav="employers">Hire IFS talent</a>
+</div></header>
+
+<main>
+<!-- JOBS (home) -->
+<section class="view" id="v-jobs">
+  <div class="hero"><div class="wrap">
+    <p class="eyebrow">The job board for the IFS ecosystem</p>
+    <h1>Find your next <em>IFS</em> job.</h1>
+    <p class="lede">IFS Cloud, Apps 10, FSM and EAM roles from the vendor, partners, customers and recruiters. One list, every region.</p>
+    <div class="search"><input type="search" id="f-q" placeholder="Search by title, company, city or skill" aria-label="Search jobs"><button class="btn" type="button" id="f-go">Search</button></div>
+    <div class="stats" id="stats"></div>
+  </div></div>
+  <div class="wrap">
+    <div class="board">
+      <form class="rail" id="filters" onsubmit="return false">
+        <label>Region<select id="f-region"><option value="">All regions</option></select></label>
+        <label>Country<select id="f-country"><option value="">All countries</option></select></label>
+        <label>Module / area<select id="f-area"><option value="">All areas</option></select></label>
+        <label>Contract<select id="f-contract"><option value="">Any</option></select></label>
+        <label class="wide">Employer type<select id="f-type"><option value="">Any</option></select></label>
+        <label class="check"><input type="checkbox" id="f-remote"> Remote or hybrid</label>
+        <label class="check"><input type="checkbox" id="f-cloud"> Names IFS Cloud</label>
+        <label class="check"><input type="checkbox" id="f-pay"> Pay stated</label>
+        <button type="button" class="linkbtn" id="f-reset">Clear all filters</button>
+      </form>
+      <div style="display:flex;flex-direction:column;gap:14px;min-width:0">
+        <div class="listhead"><h2 id="count" style="font-size:1.35rem"></h2><span class="muted small">Newest first. Every listing links to the original posting.</span></div>
+        <ul class="cards" id="jobs"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOP 10 -->
+<section class="view" id="v-top10" hidden>
+  <div class="sub"><div class="wrap"><p class="eyebrow">Top 10 partners</p><h2 id="t-title"></h2><p>Ranked for people choosing where to work or who to hire. Specialists and fast-growing firms come first; the global giants are listed but not favoured.</p></div></div>
+  <div class="wrap">
+    <div class="pills" id="t-pills" role="group" aria-label="Region"></div>
+    <ol class="rank" id="t-list"></ol>
+    <p class="method"><strong>How the ranking works.</strong> Each partner gets points for being IFS-only (3) or an ERP boutique (1.5), a recent growth signal such as a merger, new tier or new market (2), being founded since 2016 (1.5), IFS awards from 2023 to 2025 (1 each, up to 2), partner tier (Elite 1.5, Premier 1, Specialized 0.5) and a home base in the region (3). Facts come from the IFS partner directory, IFS press releases and each firm's own site. It is an editorial ranking, not an IFS one.</p>
+  </div>
+</section>
+
+<!-- DIRECTORY -->
+<section class="view" id="v-partners" hidden>
+  <div class="sub"><div class="wrap"><p class="eyebrow">Partner directory</p><h2><span id="p-total"></span> IFS partners, emerging firms first</h2><p>Every firm here is confirmed as an IFS partner by the IFS directory, an IFS announcement or an IFS event listing. Sorted by default to surface the specialists that are growing fastest.</p></div></div>
+  <div class="wrap">
+    <div class="toolbar">
+      <input type="search" class="plain" id="p-q" placeholder="Search partners, industries, cities" aria-label="Search partners">
+      <select id="p-region" aria-label="Region"><option value="">All regions</option></select>
+      <select id="p-kind" aria-label="Type"><option value="">All types</option><option value="S">IFS specialists</option><option value="B">ERP boutiques</option><option value="G">Global firms</option></select>
+      <select id="p-sort" aria-label="Sort"><option value="score">Emerging first</option><option value="az">A to Z</option><option value="tier">Highest tier first</option></select>
+    </div>
+    <p class="muted small" id="p-count"></p>
+    <ul class="grid" id="p-list"></ul>
+  </div>
+</section>
+
+<!-- RECRUITERS -->
+<section class="view" id="v-recruiters" hidden>
+  <div class="sub"><div class="wrap"><p class="eyebrow">IFS recruiters</p><h2>Who recruits for IFS</h2><p>Seven firms run an IFS-only business or a dedicated IFS desk. The rest are generalists that regularly carry IFS roles.</p></div></div>
+  <div class="wrap">
+    <h3 style="font-size:1.3rem">IFS specialists</h3>
+    <ul class="grid" id="r-1"></ul>
+    <h3 style="font-size:1.3rem;margin-top:12px">Also recruiting IFS roles</h3>
+    <ul class="grid" id="r-2"></ul>
+  </div>
+</section>
+
+<!-- EMPLOYERS -->
+<section class="view" id="v-employers" hidden>
+  <div class="sub"><div class="wrap"><p class="eyebrow">For partners and IFS customers</p><h2>Find the right IFS talent for your project</h2><p>Tell us the module, the version and the start date. The board reaches people who already work in IFS.</p></div></div>
+  <div class="wrap">
+    <div class="three">
+      <div><h3>Request a shortlist</h3><p class="muted small">Contract or permanent. You describe the role and we match on module, version and region.</p></div>
+      <div><h3>Feature a role</h3><p class="muted small">Pin your listing to the top of its module and region and include it in the weekly email.</p></div>
+      <div><h3>List your firm</h3><p class="muted small">Partners and recruiters can claim their profile, add a logo and link their open roles.</p></div>
+    </div>
+    <form class="form" id="emp-form">
+      <label>Company<input type="text" id="e-co" required></label>
+      <label>Work email<input type="email" id="e-email" required></label>
+      <label>Role<input type="text" id="e-role" placeholder="e.g. IFS Cloud Finance Consultant"></label>
+      <label>Module / area<select id="e-area"></select></label>
+      <label>What you need<select id="e-kind"><option>Contract consultant</option><option>Permanent hire</option><option>Featured listing</option><option>Claim a partner or recruiter profile</option></select></label>
+      <label>Region<select id="e-region"><option>EMEA</option><option>Americas</option><option>APAC</option><option>Remote / any</option></select></label>
+      <div class="full"><button class="btn" type="submit">Send request</button></div>
+      <p class="msg full" id="emp-msg" hidden></p>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <h2>New IFS jobs every Monday</h2>
+    <form class="news" id="news-form"><input type="email" id="n-email" placeholder="you@company.com" aria-label="Email address" required><button class="btn light" type="submit">Subscribe</button></form>
+    <p class="msg" id="news-msg" hidden style="max-width:560px"></p>
+  </div>
+  <p><strong style="color:var(--on-dark)">findifsjobs.com</strong> is an independent job board. It is not affiliated with, endorsed by or sponsored by IFS. IFS and IFS Cloud are trademarks of their owner. Company names and logos belong to their owners and are shown to identify them.</p>
+  <p>Preview build. Listings were captured on 9 October 2026 and partner and recruiter facts on 10 October 2026. Forms are not connected yet.</p>
+</div></footer>
+
+<script>
+const JOBS = /*JOBS*/[];
+const PARTNERS = /*PARTNERS*/[];
+const RECRUITERS = /*RECRUITERS*/[];
+const CAPTURED = "9 Oct";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmtDate = d => d ? new Date(d + "T00:00:00").toLocaleDateString("en-GB", {day:"numeric", month:"short"}) : null;
+const uniq = (arr, k) => [...new Set(arr.map(j => j[k]))].filter(v => v && v !== "Not stated").sort();
+const safe = u => /^https:\/\//.test(u || "") ? u : "";
+const ext = (u, t) => safe(u) ? `<a href="${esc(u)}" target="_blank" rel="noopener nofollow">${t} &#8599;</a>` : "";
+
+/* Logos: real logo files load once the site is on its own domain. Inside the preview sandbox external images are blocked, so tiles show initials. */
+const LOGOS_ON = !/claude|anthropic/i.test(location.hostname) && location.protocol === "https:";
+const TILE = ["#6A1FD0","#2B0B55","#A0288F","#4338CA","#8B2FC9","#C02675"];
+const logoOf = {}; PARTNERS.concat(RECRUITERS).forEach(p => { if (p.logo) logoOf[p.n.toLowerCase()] = p.logo; });
+function logo(name, url){
+  const words = name.replace(/\(.*?\)/g,"").trim().split(/[\s&-]+/).filter(Boolean);
+  const ini = (words.length > 1 ? words[0][0] + words[1][0] : name.slice(0,2)).toUpperCase();
+  let h = 0; for (const c of name) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  url = url || logoOf[name.toLowerCase()];
+  return `<span class="logo" style="--lg:${TILE[h % TILE.length]}" aria-hidden="true">${esc(ini)}${LOGOS_ON && safe(url) ? `<img src="${esc(url)}" alt="" loading="lazy">` : ""}</span>`;
+}
+document.addEventListener("error", e => { if (e.target.tagName === "IMG") e.target.remove(); }, true);
+
+/* ---------- navigation ---------- */
+const VIEWS = ["jobs","top10","partners","recruiters","employers"];
+function show(v){
+  if (!VIEWS.includes(v)) v = "jobs";
+  VIEWS.forEach(x => { $("#v-"+x).hidden = x !== v; });
+  document.querySelectorAll(".tabs [data-nav]").forEach(a => a.dataset.nav === v ? a.setAttribute("aria-current","page") : a.removeAttribute("aria-current"));
+}
+document.addEventListener("click", e => {
+  const a = e.target.closest("[data-nav]"); if (!a) return;
+  e.preventDefault(); show(a.dataset.nav);
+  try { history.replaceState(null, "", "#" + a.dataset.nav); } catch (_) {}
+  window.scrollTo(0, 0);
+});
+show((location.hash || "#jobs").slice(1));
+
+/* ---------- jobs ---------- */
+const sorted = [...JOBS].sort((a,b) => (b.posted||"").localeCompare(a.posted||""));
+function fill(sel, vals){ const el = $(sel); vals.forEach(v => { const o = document.createElement("option"); o.textContent = v; o.value = v; el.appendChild(o); }); }
+fill("#f-region", uniq(JOBS,"region")); fill("#f-country", uniq(JOBS,"country")); fill("#f-area", uniq(JOBS,"area"));
+fill("#f-contract", uniq(JOBS,"contract_type")); fill("#f-type", uniq(JOBS,"company_type")); fill("#e-area", uniq(JOBS,"area"));
+function renderJobs(){
+  const q = $("#f-q").value.trim().toLowerCase(), r = $("#f-region").value, co = $("#f-country").value, a = $("#f-area").value, c = $("#f-contract").value, t = $("#f-type").value;
+  const rem = $("#f-remote").checked, cl = $("#f-cloud").checked, pay = $("#f-pay").checked;
+  const list = sorted.filter(j => (!r || j.region === r) && (!co || j.country === co) && (!a || j.area === a) && (!c || j.contract_type === c) && (!t || j.company_type === t) &&
+    (!rem || j.work_mode === "Remote" || j.work_mode === "Hybrid") && (!cl || j.ifs_version === "IFS Cloud") && (!pay || j.pay) &&
+    (!q || [j.title,j.company,j.city,j.country,j.area,j.summary,j.ifs_version].join(" ").toLowerCase().includes(q)));
+  $("#count").textContent = list.length === JOBS.length ? `All ${list.length} open IFS jobs` : `${list.length} of ${JOBS.length} jobs`;
+  $("#jobs").innerHTML = list.length ? list.map(j => {
+    const chips = [j.area, j.ifs_version, j.work_mode, j.contract_type, j.seniority].filter(x => x && x !== "Not stated");
+    const loc = [j.city !== "Not stated" ? j.city : null, j.country].filter(Boolean).join(", ");
+    return `<li class="card">${logo(j.company.replace(/^IFS \(.*\)$/,"IFS"))}<div class="body">
+      <h3><a href="${esc(safe(j.url))}" target="_blank" rel="noopener nofollow">${esc(j.title)}</a></h3>
+      <p class="who">${esc(j.company)} <span>· ${esc(loc)} · ${esc(j.company_type)}</span></p>
+      <p class="sum">${esc(j.summary)}</p>
+      <div class="chips">${chips.map(x => `<span class="chip${x==="IFS Cloud"?" v":""}">${esc(x)}</span>`).join("")}</div></div>
+      <div class="side">${j.pay ? `<span class="pay">${esc(j.pay)}</span>` : ""}<span class="date">${j.posted ? "Posted " + fmtDate(j.posted) : "Seen " + CAPTURED}</span>
+      <a class="btn sm ghost" href="${esc(safe(j.url))}" target="_blank" rel="noopener nofollow">View job</a></div></li>`;
+  }).join("") : `<li class="empty">No jobs match those filters. Clear one and try again.</li>`;
+}
+["#f-q","#f-region","#f-country","#f-area","#f-contract","#f-type","#f-remote","#f-cloud","#f-pay"].forEach(s => $(s).addEventListener("input", renderJobs));
+$("#f-go").addEventListener("click", () => { renderJobs(); $("#count").scrollIntoView({behavior:"smooth", block:"start"}); });
+$("#f-reset").addEventListener("click", () => { $("#filters").reset(); $("#f-q").value = ""; renderJobs(); });
+renderJobs();
+const cloud = JOBS.filter(j => j.ifs_version === "IFS Cloud").length, remote = JOBS.filter(j => j.work_mode === "Remote" || j.work_mode === "Hybrid").length;
+$("#stats").innerHTML = `<span><b>${JOBS.length}</b> open roles</span><span><b>${uniq(JOBS,"country").length}</b> countries</span><span><b>${cloud}</b> on IFS Cloud</span><span><b>${remote}</b> remote or hybrid</span><span><b>${PARTNERS.length}</b> partners listed</span>`;
+
+/* ---------- partners ---------- */
+const REG = {NA:["USA & Canada","the USA and Canada"],UK:["UK & Ireland","the UK and Ireland"],NORD:["Nordics","the Nordics"],DACH:["DACH","Germany, Austria and Switzerland"],EU:["Rest of Europe","Benelux, France and the rest of Europe"],MEA:["Middle East & Africa","the Middle East and Africa"],SA:["South Asia","South Asia"],APAC:["Asia Pacific","Asia Pacific"]};
+const KIND = {S:"IFS specialist",B:"ERP boutique",G:"Global firm"};
+const TIERV = {Elite:3,Premier:2,Specialized:1};
+const emerging = p => p.kind !== "G" && !!p.sig;
+function chipsFor(p){
+  return [p.tier ? `<span class="chip v">${esc(p.tier)}</span>` : "", `<span class="chip">${KIND[p.kind]}</span>`, emerging(p) ? `<span class="chip e">Emerging</span>` : "", p.founded ? `<span class="chip">Founded ${p.founded}</span>` : ""].join("");
+}
+function partnerLinks(p){ return [ext(p.web,"Website"), ext(p.careers,"Careers"), ext(p.src,"Source")].filter(Boolean).join(""); }
+
+let tRegion = "NA";
+$("#t-pills").innerHTML = Object.keys(REG).map(k => `<button type="button" class="pill" data-r="${k}">${REG[k][0]}</button>`).join("");
+function renderTop(){
+  document.querySelectorAll("#t-pills .pill").forEach(b => b.setAttribute("aria-pressed", b.dataset.r === tRegion));
+  $("#t-title").textContent = "Top 10 IFS partners in " + REG[tRegion][1];
+  const list = PARTNERS.filter(p => p.r.includes(tRegion)).map(p => ({p, s: p.score + (p.home === tRegion ? 3 : 0)})).sort((a,b) => b.s - a.s || a.p.n.localeCompare(b.p.n)).slice(0,10);
+  $("#t-list").innerHTML = list.map(({p}) => `<li class="card">${logo(p.n,p.logo)}<div class="body">
+    <h3>${esc(p.n)}</h3><p class="who"><span>${esc(p.hq)}${p.size ? " · " + esc(p.size) : ""}</span></p>
+    <p class="sum">${esc(p.sig || p.blurb)}</p>${p.awards ? `<p class="kv"><b>Awards:</b> ${esc(p.awards)}</p>` : ""}
+    <div class="chips">${chipsFor(p)}</div></div><div class="side"><div class="links">${partnerLinks(p)}</div></div></li>`).join("");
+}
+$("#t-pills").addEventListener("click", e => { const b = e.target.closest(".pill"); if (b) { tRegion = b.dataset.r; renderTop(); } });
+renderTop();
+
+Object.keys(REG).forEach(k => { const o = document.createElement("option"); o.value = k; o.textContent = REG[k][0]; $("#p-region").appendChild(o); });
+$("#p-total").textContent = PARTNERS.length;
+function renderPartners(){
+  const q = $("#p-q").value.trim().toLowerCase(), r = $("#p-region").value, k = $("#p-kind").value, s = $("#p-sort").value;
+  let list = PARTNERS.filter(p => (!r || p.r.includes(r)) && (!k || p.kind === k) && (!q || [p.n,p.hq,p.focus,p.blurb,p.tier].join(" ").toLowerCase().includes(q)));
+  list.sort(s === "az" ? (a,b) => a.n.localeCompare(b.n) : s === "tier" ? (a,b) => (TIERV[b.tier]||0) - (TIERV[a.tier]||0) || a.n.localeCompare(b.n) : (a,b) => b.score - a.score || a.n.localeCompare(b.n));
+  $("#p-count").textContent = `${list.length} of ${PARTNERS.length} partners`;
+  $("#p-list").innerHTML = list.length ? list.map(p => `<li class="card">${logo(p.n,p.logo)}<div class="body">
+    <h3>${esc(p.n)}</h3><p class="who"><span>${esc(p.hq)}</span></p></div>
+    <div class="body" style="grid-column:1/-1"><p class="sum">${esc(p.blurb)}</p>
+    <p class="kv"><b>Focus:</b> ${esc(p.focus)}</p>${p.size ? `<p class="kv"><b>Size:</b> ${esc(p.size)}</p>` : ""}
+    <p class="kv"><b>Active in:</b> ${p.r.map(x => REG[x][0]).join(", ")}</p>
+    <div class="chips">${chipsFor(p)}</div></div><div class="foot">${partnerLinks(p)}</div></li>`).join("") : `<li class="empty">No partners match. Try a different search.</li>`;
+}
+["#p-q","#p-region","#p-kind","#p-sort"].forEach(x => $(x).addEventListener("input", renderPartners));
+renderPartners();
+
+/* ---------- recruiters ---------- */
+const rc = r => `<li class="card">${logo(r.n,r.logo)}<div class="body"><h3>${esc(r.n)}</h3><p class="who"><span>${esc(r.hq)}</span></p></div>
+  <div class="body" style="grid-column:1/-1"><p class="sum">${esc(r.blurb)}</p><p class="kv"><b>Covers:</b> ${esc(r.cover)}</p><p class="kv"><b>Evidence:</b> ${esc(r.ev)}</p>
+  <div class="chips"><span class="chip${r.tier===1?" v":""}">${esc(r.focus)}</span>${r.type ? `<span class="chip">${esc(r.type)}</span>` : ""}</div></div>
+  <div class="foot">${[ext(r.web,"Website"), ext(r.jobs,"IFS jobs"), ext(r.src,"Source")].filter(Boolean).join("")}</div></li>`;
+$("#r-1").innerHTML = RECRUITERS.filter(r => r.tier === 1).map(rc).join("");
+$("#r-2").innerHTML = RECRUITERS.filter(r => r.tier === 2).map(rc).join("");
+
+/* ---------- forms (not connected in the preview) ---------- */
+function demo(form, msg, text){ $(form).addEventListener("submit", e => { e.preventDefault(); $(msg).textContent = text; $(msg).hidden = false; }); }
+demo("#news-form","#news-msg","Nothing was sent. This preview is not connected to an email tool yet, so your address was not stored.");
+demo("#emp-form","#emp-msg","Nothing was sent. This preview does not store requests yet.");
+</script>
