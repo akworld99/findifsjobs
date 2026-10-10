@@ -61,21 +61,17 @@ SOURCES = [
     ("breezy", "tsunami-tsolutions", "Tsunami Tsolutions", "IFS partner", False),
     # Partners with their own careers page: we read the job links off the page
     ("html", "https://www.wiasystems.com/careers", "WIA Systems", "IFS partner", True),
-    ("html", "https://platned.com/careers", "Platned", "IFS partner", False),
     ("html", "https://e-analytics.com/careers", "Enterprise Analytics", "IFS partner", False),
     ("html", "https://kaizens.co.uk/careers", "Kaizens Group", "IFS partner", False),
     ("html", "https://iconique.tech/careers/", "Iconique", "IFS partner", True),
     ("html", "https://xitricon.com/careers/", "Xitricon", "IFS partner", False),
     ("html", "https://12guide.com/bedrijf/vacatures", "12Guide", "IFS partner", True),
-    ("html", "https://covalentworld.com/careers/", "Covalent Systems", "IFS partner", True),
     ("html", "https://www.solika-consulting.com/en/jobs", "Solika Consulting", "IFS partner", True),
-    ("html", "https://www.flexicode.net/en/jobs/", "FLEXiCODE", "IFS partner", True),
     # IFS customers
     ("workable", "bw-energy", "BW Energy", "IFS customer", False),
     # Recruiters
     ("wprss", "https://goliverecruitment.com/live-jobs/feed/", "GoLive Recruitment", "Recruiter", True),
     ("html", "https://www.cubiqrecruitment.com/search-jobs/", "Cubiq Recruitment", "Recruiter", False),
-    ("html", "https://www.itworksrec.co.uk/jobs/", "IT Works Recruitment", "Recruiter", False),
     # Add more here, e.g. ("greenhouse", "boardtoken", "Company", "IFS customer", False),
 ]
 ADZUNA_COUNTRIES = ["gb", "us", "de", "nl", "au", "in", "ca", "se"]
@@ -113,6 +109,8 @@ def is_ifs_job(title, text, ifs_only=False):
         return bool(VENDOR_ROLES.search(title)) and not VENDOR_SKIP.search(title)
     if ifs_only:
         return bool(ROLE_WORDS.search(title))
+    if re.search(r"\bIFS\b", title) and ROLE_WORDS.search(title):
+        return True
     return bool(IFS_STRONG.search(blob))
 
 
@@ -332,7 +330,8 @@ def fetch_breezy(slug, name, ctype, ifs_only):
 
 def fetch_wprss(url, name, ctype, ifs_only):
     """WordPress job feeds: titles, links and dates only."""
-    root = ET.fromstring(get(url))
+    raw = get(url)
+    root = ET.fromstring(raw[max(raw.find(b"<?xml"), 0):].strip() if b"<?xml" in raw else raw.strip())
     out = []
     for it in root.iter("item"):
         title = (it.findtext("title") or "").strip()
@@ -352,26 +351,38 @@ NOT_A_TITLE = re.compile(r"^(view|apply|read|learn|see|all|open|join|our|about|c
                          r"cookie|privacy|linkedin|unsolicited|open application|initiativ", re.I)
 
 
+CAPS = {"ifs", "erp", "eam", "fsm", "pso", "hcm", "scm", "mro", "uk", "us", "usa", "uae", "anz", "ai", "hr", "it", "bi", "qa"}
+
+
+def title_from_slug(link):
+    """'/careers/vacancy-ifs-project-manager-sri-lanka' -> 'IFS Project Manager Sri Lanka'"""
+    slug = urllib.parse.unquote(link.rstrip("/").rsplit("/", 1)[-1])
+    slug = re.sub(r"^(vacancy|job|position)-|-\d+$|\.html?$", "", slug, flags=re.I)
+    words = [w for w in re.split(r"[-_]+", slug) if w]
+    return " ".join(w.upper() if w.lower() in CAPS else w.capitalize() for w in words)
+
+
 def fetch_html(url, name, ctype, ifs_only):
     """Own-site careers pages: read job links straight off the listing page.
-    Works only when the jobs are in the page HTML (not loaded later by script)."""
+    Works only when the jobs are in the page HTML (not loaded later by script).
+    If the link text is just "Apply" or a whole card, the title comes from the link address."""
     page = get(url).decode("utf-8", "ignore")
-    seen, out = set(), []
-    for href, inner in LINK.findall(page):
+    seen, out, links = set(), [], LINK.findall(page)
+    for href, inner in links:
         full = urllib.parse.urljoin(url, html.unescape(href.strip()))
-        title = strip_html(re.split(r"</h[1-6]>|<br|</p>|</span>", inner, 1)[0]) or strip_html(inner)
         if not full.startswith("https://") or full.rstrip("/") == url.rstrip("/") or not JOB_PATH.search(full):
             continue
-        if not 8 <= len(title) <= 110 or len(title.split()) < 2 or NOT_A_TITLE.search(title):
+        title = strip_html(inner)
+        if not 8 <= len(title) <= 90 or len(title.split()) < 2 or NOT_A_TITLE.search(title) or \
+                re.fullmatch(r"(find out|read more|apply( now)?|view( job| details)?|details|more info)\W*", title, re.I):
+            title = title_from_slug(full)
+        if len(title.split()) < 2 or full in seen or title.lower() in seen or not is_ifs_job(title, "", ifs_only):
             continue
-        if not is_ifs_job(title, "", ifs_only) or title.lower() in seen:
-            continue
-        seen.add(title.lower())
+        seen.update((full, title.lower()))
         out.append(make_job(title, name, ctype, None, guess_country(title), full))
     if not out:   # leave a trail so the page can be diagnosed
-        links = LINK.findall(page)
-        cand = [(urllib.parse.urljoin(url, h), strip_html(t)[:60]) for h, t in links if JOB_PATH.search(urllib.parse.urljoin(url, h))]
-        REPORT.append(f"    {name}: page {len(page)} chars, {len(links)} links, {len(cand)} job-like; sample {cand[:6]}")
+        cand = [urllib.parse.urljoin(url, h) for h, t in links if JOB_PATH.search(urllib.parse.urljoin(url, h))]
+        REPORT.append(f"    {name}: page {len(page)} chars, {len(links)} links, {len(cand)} job-like; sample {cand[:5]}")
     return out
 
 
