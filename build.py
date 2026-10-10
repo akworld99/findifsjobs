@@ -433,11 +433,11 @@ for p in partners:
     pc = PCOUNTRY.get(p["n"])
     bd = ""
     if ranks:
-        br = ranks[0][0]
+        br = min(ranks, key=lambda x: (x[1], x[0] != p.get("home")))[0]   # best placing; home region wins a tie
         bcode = (f'<a href="{SITE}/top-ifs-partners/{REG[br][2]}/"><img src="{SITE}/badges/top-10-ifs-partner-{REG[br][2]}.svg" '
                  f'alt="Top 10 IFS Partner {TODAY.year}, {REG[br][0]} - findifsjobs" width="220" height="82"></a>')
         bd = (f'<div class="note"><h3>Show your ranking</h3><img class="badge" src="{root}badges/top-10-ifs-partner-{REG[br][2]}.svg" alt="Top 10 IFS Partner {TODAY.year}, {e(REG[br][0])}" width="220" height="82">'
-              f'<p class="small">Work at {e(p["n"])}? Paste this on your website or careers page.</p><textarea class="code" readonly rows="4" aria-label="Badge embed code" onclick="this.select()">{e(bcode)}</textarea></div>')
+              f'<p class="small">Work at {e(p["n"])}? Paste this on your website or careers page.</p><textarea class="code" readonly rows="7" aria-label="Badge embed code" onclick="this.select()">{e(bcode)}</textarea></div>')
     rank_html = ('<div class="note"><h3>Rankings</h3><ul>' + "".join(f'<li><a href="{root}top-ifs-partners/{REG[r][2]}/">#{n} in {e(REG[r][0])}</a></li>' for r, n in ranks) + "</ul></div>") if ranks else ""
     pl = "".join(x for x in (ext(p.get("web"), "Website"), ext(p.get("careers"), "Careers page"), ext(p.get("src"), "Source for partner status")) if x)
     jobs_html = (f'<section class="stack"><h2>Open IFS jobs at {e(p["n"])}</h2><ul class="rows">{"".join(job_row(j, root) for j in p["jobs"])}</ul></section>' if p["jobs"]
