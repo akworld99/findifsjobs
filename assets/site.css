@@ -284,3 +284,10 @@ a:hover .go i{transform:translateX(5px)}
 .pod h2,.pod h2 a{font-weight:800}
 .rrow h3 a{font-weight:700}
 
+
+.mstrip{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 20px;margin-top:28px;padding:14px 18px;border:1px solid var(--line);border-left:3px solid var(--brand);border-radius:var(--r);background:var(--soft);color:var(--ink);font-size:.9rem}
+.mstrip:hover{text-decoration:none;border-color:var(--brand);background:var(--brand-soft)}
+.mstrip b{font-weight:600}
+.mstrip .go{color:var(--brand);font-weight:600;white-space:nowrap}
+.mstrip .go i{font-style:normal;display:inline-block;transition:transform .15s}
+.mstrip:hover .go i{transform:translateX(4px)}

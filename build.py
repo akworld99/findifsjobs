@@ -208,7 +208,7 @@ def page(path, title, desc, body, active="", ld=(), crumbs=(), priority="0.6", l
               f'<button class="btn" type="submit">Subscribe</button></form><p class="msg" hidden style="max-width:480px"></p></div>'
               f'<ul class="linklist"><li><a href="{root}about/">About and method</a></li><li><a href="{root}ifs-hiring-report/">IFS hiring report</a></li>'
               f'<li><a href="{root}ifs-jobs/remote/">Remote IFS jobs</a></li><li><a href="{root}ifs-jobs/contract/">IFS contract jobs</a></li>'
-              f'<li><a href="{root}ifs-jobs/ifs-cloud/">IFS Cloud jobs</a></li><li><a href="{root}hire/">Hire IFS talent</a></li></ul>'
+              f'<li><a href="{root}ifs-jobs/ifs-cloud/">IFS Cloud jobs</a></li><li><a href="{root}hire/">Hire IFS talent</a></li><li><a href="{root}marketing-for-ifs-partners/">Marketing for IFS partners</a></li></ul>'
               f'<p><b style="color:var(--ink);font-weight:500">findifsjobs.com</b> is an independent job board. It is not affiliated with, endorsed by or sponsored by IFS. '
               f'IFS and IFS Cloud are trademarks of their owner. Company names and logos belong to their owners and are shown to identify them.</p>'
               f'<p>Jobs refresh daily from public careers pages. Last updated {TODAY.strftime("%-d %B %Y")}.</p></div></footer>')
@@ -363,6 +363,8 @@ for key, (h, test, path) in SPECIAL.items():
                 [(f"How many {h.lower()} are open?", f"{plural(len(items), 'role')} out of {N} IFS jobs listed, as of {TODAY.strftime('%-d %B %Y')}.")], h)
 
 # ---- partners: directory and profiles
+mstrip = lambda root: (f'<a class="mstrip" href="{root}marketing-for-ifs-partners/"><span><b>Run an IFS partner firm?</b> We help partners fill their pipeline and their hiring funnel.</span>'
+                       f'<span class="go">Marketing for IFS partners <i aria-hidden="true">&rarr;</i></span></a>')
 cells = ""
 for p in sorted(partners, key=lambda p: (-p["score"], p["n"])):
     text = " ".join(str(p.get(k) or "") for k in ("n", "hq", "focus", "blurb", "tier")).lower()
@@ -379,7 +381,7 @@ toolbar = ('<div class="toolbar"><input type="search" class="plain" id="p-q" pla
 page("partners/", f"IFS partner directory: {len(partners)} implementation partners | findifsjobs",
      f"{len(partners)} verified IFS partners across eight regions, with tier, size, focus and careers links. Sorted to surface emerging IFS specialists first.",
      hero("Partner directory", f"{len(partners)} IFS partners, emerging firms first", "Every firm is confirmed as an IFS partner by the IFS directory, an IFS announcement or an IFS event listing.")
-     + f'<div class="wrap">{toolbar}<p class="muted small" id="p-count">{len(partners)} of {len(partners)} partners</p><ul class="grid" id="p-list">{cells}</ul></div>',
+     + f'<div class="wrap">{toolbar}<p class="muted small" id="p-count">{len(partners)} of {len(partners)} partners</p><ul class="grid" id="p-list">{cells}</ul>{mstrip("../")}</div>',
      active="partners/", crumbs=[("Partner directory", None)], priority="0.8")
 
 for p in partners:
@@ -396,7 +398,7 @@ for p in partners:
     body = (hero("IFS partner", f'<span class="pagelogo">{logo(p["n"], root, True)}<span>{e(p["n"])}</span></span>', e(p["blurb"]), h1cls="small")
             + f'<div class="wrap"><div class="article"><div class="stack">'
             + (f'<div class="prose"><h2>What stands out</h2><p>{e(p["sig"])}</p></div>' if p.get("sig") else "")
-            + f'{table}<div class="tags">{tags_for(p)}</div>{jobs_html}</div><div class="stack">{rank_html}<div class="note"><h3>Links</h3><div class="cell" style="border:0;padding:0;background:none"><div class="foot" style="border:0;padding:0;flex-direction:column">{pl}</div></div></div></div></div></div>')
+            + f'{table}<div class="tags">{tags_for(p)}</div>{jobs_html}</div><div class="stack">{rank_html}<div class="note"><h3>Links</h3><div class="cell" style="border:0;padding:0;background:none"><div class="foot" style="border:0;padding:0;flex-direction:column">{pl}</div></div></div></div></div>{mstrip(root)}</div>')
     page(p["path"], f"{p['n']}: IFS partner profile, jobs and facts | findifsjobs",
          f"{p['n']} is an IFS partner based in {p['hq']}. {p['blurb']} Tier, size, focus, awards and open IFS jobs.", body, active="partners/",
          ld=[{"@context": "https://schema.org", "@type": "Organization", "name": p["n"], **({"url": p["web"]} if p.get("web") else {}), "description": p["blurb"]}],
@@ -579,8 +581,23 @@ hire_form = ('<form class="form" data-kind="employer request" data-done="Request
 page("hire/", "Hire IFS consultants and developers | findifsjobs",
      "Find IFS talent for your project: request a shortlist, feature a role or claim your partner profile on the job board built for the IFS ecosystem.",
      hero("For partners and IFS customers", "Find the right IFS talent for your project", "Tell us the module, the version and the start date. The board reaches people who already work in IFS.")
-     + f'<div class="wrap">{three([("Request a shortlist", "Contract or permanent. You describe the role and we match on module, version and region."), ("Feature a role", "Pin your listing to the top of its module and region and include it in the weekly email."), ("List your firm", "Partners and recruiters can claim their profile, add a logo and link their open roles.")])}{hire_form}</div>',
+     + f'<div class="wrap">{three([("Request a shortlist", "Contract or permanent. You describe the role and we match on module, version and region."), ("Feature a role", "Pin your listing to the top of its module and region and include it in the weekly email."), ("List your firm", "Partners and recruiters can claim their profile, add a logo and link their open roles.")])}{hire_form}{mstrip("../")}</div>',
      crumbs=[("Hire IFS talent", None)], priority="0.7")
+mk_form = ('<form class="form" data-kind="marketing enquiry" data-done="Got it. We will reply by email within two working days.">'
+           '<label>Your name<input type="text" name="name" required></label><label>Work email<input type="email" name="email" required></label>'
+           '<label>Company<input type="text" name="company" required></label>'
+           '<label>What you need most<select name="need"><option>More qualified leads</option><option>LinkedIn and content</option><option>Event marketing</option><option>Hiring and employer brand</option><option>Not sure yet</option></select></label>'
+           '<label class="full">Anything we should know<input type="text" name="notes" placeholder="Markets, industries, timing"></label>'
+           '<div class="full"><button class="btn" type="submit">Ask for a plan</button></div><p class="msg full" hidden></p></form>')
+mk_faq, mk_ld = faq([("Who is this for?", "IFS implementation, services and technology partners, and firms that sell to IFS customers. Small and mid-sized partners get the most from it."),
+                     ("What do you do first?", "A short call, then a written plan: who to target, what to say, which channels, and what it should cost per qualified lead."),
+                     ("Does working with you affect the partner rankings?", "No. The Top 10 lists and the directory are editorial and separate from any paid work.")])
+page("marketing-for-ifs-partners/", "Marketing for IFS partners: leads, LinkedIn, events and hiring | findifsjobs",
+     "Marketing services built for IFS partners: lead generation by IFS industry, LinkedIn and content, event marketing and employer brand, from the team behind findifsjobs.",
+     hero("For IFS partners", "Marketing built for <em>IFS partners</em>", "Most agencies have to learn what IFS Cloud, FSM and EAM are before they can sell them. We already work in this ecosystem every day.")
+     + f'<div class="wrap">{three([("Leads by IFS industry", "Campaigns aimed at the buyers IFS partners sell to: manufacturing, energy, aerospace, service and asset-heavy firms. Paid, outbound and landing pages, measured on qualified meetings."), ("LinkedIn and content", "A company page and consultant profiles that IFS buyers notice. Case studies, module explainers and upgrade content that rank in search and in AI answers."), ("Events and hiring", "Before, during and after IFS Connect and industry shows. Plus employer brand and featured roles on this board when you need consultants fast.")])}'
+       f'<div class="prose"><h2>How it works</h2><p>You tell us the markets and the IFS industries you want to grow in. We come back with a plan and a fixed monthly scope. No long lock-in.</p></div>{mk_form}{mk_faq}</div>',
+     ld=[mk_ld], crumbs=[("Marketing for IFS partners", None)], priority="0.6")
 page("about/", "About findifsjobs and how the data is collected",
      "findifsjobs is an independent job board and directory for the IFS ERP ecosystem. How jobs are collected, how partners are verified and how rankings work.",
      hero("About", "About findifsjobs", "An independent job board and directory for people who work with IFS Cloud, IFS Applications, FSM and EAM.")
