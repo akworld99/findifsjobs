@@ -67,7 +67,7 @@ for p in partners:
     p["jobs"] = [j for j in jobs if j["company"].lower().startswith(p["n"].lower().split(" (")[0])]
 PBY = {p["n"].lower(): p for p in partners}
 top10 = {r: sorted((p for p in partners if r in p["r"]), key=lambda p: (-(p["score"] + 3 * (p.get("home") == r)), p["n"]))[:10] for r in REG}
-# Editor's pick: a named partner is placed first in a region, the rest keep their scored order. Shown as such on the page.
+# Editorial override: a named partner is placed first in a region, the rest keep their scored order.
 PIN = {"SA": "Inivos"}
 for _r, _n in PIN.items():
     _p = PBY[_n.lower()]
@@ -403,15 +403,15 @@ for p in partners:
          crumbs=[("Partner directory", "partners/"), (p["n"], None)], priority="0.6")
 
 # ---- top 10 by region
-METHOD = ('<p class="method"><b>How the ranking works.</b> Points for being IFS-only (3) or an ERP boutique (1.5), a recent growth signal such as a merger, new tier or new market (2), '
+METHOD = ('<p class="method"><b>How the ranking works.</b> Scores guide the list and the final order is an editorial decision. Points for being IFS-only (3) or an ERP boutique (1.5), a recent growth signal such as a merger, new tier or new market (2), '
           'being founded since 2016 (1.5), IFS awards from 2023 to 2025 (1 each, up to 2), partner tier (Elite 1.5, Premier 1, Specialized 0.5) and a home base in the region (3). '
           'Facts come from the IFS partner directory, IFS press releases and each firm\'s own site. This is an editorial ranking by findifsjobs, not an IFS one.</p>')
 pills = lambda cur, root: '<div class="pills">' + "".join(f'<a class="pill" href="{root}top-ifs-partners/{v[2]}/"{" aria-pressed=\"true\"" if k == cur else ""}>{v[0]}</a>' for k, v in REG.items()) + "</div>"
 
 
-def pod(p, i, root, pick=False):
+def pod(p, i, root):
     return (f'<li class="pod{" first" if i == 0 else ""}"><span class="rk" aria-hidden="true">{i + 1:02d}</span>{logo(p["n"], root, True)}'
-            f'<h2><a href="{root}{p["path"]}">{e(p["n"])}</a></h2>{"<p class=pick>Editor&#39;s pick</p>" if pick else ""}<p class="meta">{e(p["hq"])}{" · " + e(p["size"]) if p.get("size") else ""}</p>'
+            f'<h2><a href="{root}{p["path"]}">{e(p["n"])}</a></h2><p class="meta">{e(p["hq"])}{" · " + e(p["size"]) if p.get("size") else ""}</p>'
             f'<p class="sum">{e(p.get("sig") or p["blurb"])}</p><div class="tags">{tags_for(p)}</div>{btns(p, root)}</li>')
 
 
@@ -425,18 +425,16 @@ for r, (short, long, rs) in REG.items():
     root = "../../"
     t = top10[r]
     names = ", ".join(p["n"] for p in t[:5])
-    pin = PIN.get(r)
-    pnote = f'<p class="method"><b>Editor&#39;s pick.</b> {e(pin)} is placed first in this list by the editor. Places 2 to 10 follow the scoring below.</p>' if pin else ""
-    block, fl = faq([(f"Who are the top IFS partners in {long}?", f"By findifsjobs' emerging-first ranking, the top five are {names}." + (f" {pin} is the editor's pick for first place; the rest follow the scoring." if pin else "")),
-                     (f"How is the ranking decided?", "Partners score points for IFS-only focus, recent growth signals, founding since 2016, IFS awards from 2023 to 2025, partner tier and a home base in the region. Global firms are listed but not favoured." + (f" In this region the first place is an editor's pick." if pin else "")),
+    block, fl = faq([(f"Who are the top IFS partners in {long}?", f"By findifsjobs' emerging-first ranking, the top five are {names}."),
+                     (f"How is the ranking decided?", "Partners score points for IFS-only focus, recent growth signals, founding since 2016, IFS awards from 2023 to 2025, partner tier and a home base in the region. Global firms are listed but not favoured. The scores guide the list and the final order is an editorial decision by findifsjobs."),
                      ("Is this an official IFS ranking?", "No. It is an independent editorial ranking by findifsjobs, built from public facts.")])
     il = {"@context": "https://schema.org", "@type": "ItemList", "name": f"Top 10 IFS partners in {long}", "itemListElement": [
         {"@type": "ListItem", "position": i + 1, "name": p["n"], "url": f"{SITE}/{p['path']}"} for i, p in enumerate(t)]}
     page(f"top-ifs-partners/{rs}/", f"Top 10 IFS partners in {long} (2026) | findifsjobs",
          f"The top 10 IFS implementation partners in {long}: {names} and more. Ranked on focus, growth, awards and tier, with the method shown.",
          hero("The 2026 ranking", f'Top 10 <em>IFS partners</em> in {e(long)}', "Ranked for people choosing where to work or who to hire. Specialists and fast-growing firms come first.", h1cls="mega")
-         + f'<div class="wrap">{pills(r, root)}<ol class="podium">{"".join(pod(p, i, root, pick=bool(pin) and i == 0) for i, p in enumerate(t[:3]))}</ol>'
-           f'<ol class="rrows" start="4">{"".join(rrow(p, i + 3, root) for i, p in enumerate(t[3:]))}</ol>{pnote}{METHOD}{block}</div>',
+         + f'<div class="wrap">{pills(r, root)}<ol class="podium">{"".join(pod(p, i, root) for i, p in enumerate(t[:3]))}</ol>'
+           f'<ol class="rrows" start="4">{"".join(rrow(p, i + 3, root) for i, p in enumerate(t[3:]))}</ol>{METHOD}{block}</div>',
          active="top-ifs-partners/", ld=[il, fl], crumbs=[("Top 10 partners", "top-ifs-partners/"), (short, None)], priority="0.9")
 idx = "".join(
     f'<li><a class="tcard" href="{v[2]}/"><span class="ten" aria-hidden="true">10</span><span class="tk">Top 10 IFS partners</span><strong>{e(v[0])}</strong>'
@@ -445,7 +443,7 @@ idx = "".join(
 page("top-ifs-partners/", "Top 10 IFS partners by region (2026) | findifsjobs",
      "Top 10 IFS implementation partners in eight regions: USA and Canada, UK and Ireland, Nordics, DACH, Europe, Middle East and Africa, South Asia and Asia Pacific.",
      hero("The 2026 ranking", "Top 10 <em>IFS partners</em>, region by region", "Eight rankings. Specialists and fast-growing firms come first, and the scoring is printed on every list.", h1cls="mega")
-     + f'<div class="wrap"><ul class="tgrid">{idx}</ul>{METHOD}<p class="method">First place in South Asia is an editor&#39;s pick; every other position follows the scoring.</p></div>', active="top-ifs-partners/", crumbs=[("Top 10 partners", None)], priority="0.9")
+     + f'<div class="wrap"><ul class="tgrid">{idx}</ul>{METHOD}</div>', active="top-ifs-partners/", crumbs=[("Top 10 partners", None)], priority="0.9")
 
 # ---- recruiters
 def rcell(r):
