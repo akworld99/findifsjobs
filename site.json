@@ -2,6 +2,6 @@
  "url": "https://findifsjobs.com",
  "name": "findifsjobs",
  "ga_id": "G-9V26PLC2NB",
- "form_endpoint": "",
+ "form_endpoint": "https://formspree.io/f/mdeazeby",
  "search_console_meta": ""
 }
