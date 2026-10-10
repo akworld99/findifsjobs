@@ -65,3 +65,22 @@ $$("form[data-kind]").forEach(f => f.addEventListener("submit", async e => {
     if (m) m.textContent = f.dataset.done || "Received. Thank you."; f.reset();
   } catch (_) { if (m) m.textContent = "That didn't send. Check your connection and try again."; }
 }));
+
+/* Hiring report: switch the breakdown, and show detail on hover or focus */
+const ct = $("#c-tabs");
+if (ct) {
+  ct.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    $$("#c-tabs button").forEach(x => x.setAttribute("aria-pressed", x === b));
+    $$(".chart").forEach(c => { c.hidden = c.id !== "c-" + b.dataset.c; c.classList.remove("in"); if (!c.hidden) { void c.offsetWidth; c.classList.add("in"); } });
+    $("#c-title").textContent = b.dataset.title;
+  });
+  const tip = document.createElement("div"); tip.className = "tip"; tip.hidden = true; document.body.appendChild(tip);
+  const show = (el, x, y) => { tip.textContent = el.dataset.tip; tip.hidden = false; tip.style.left = Math.min(Math.max(x, 140), innerWidth - 140) + "px"; tip.style.top = y + "px"; };
+  $$(".bar").forEach(el => {
+    el.addEventListener("mousemove", ev => show(el, ev.clientX, ev.clientY));
+    el.addEventListener("mouseleave", () => { tip.hidden = true; });
+    el.addEventListener("focus", () => { const r = el.getBoundingClientRect(); show(el, r.left + r.width / 2, r.top); });
+    el.addEventListener("blur", () => { tip.hidden = true; });
+  });
+}

@@ -48,6 +48,10 @@ for j in jobs:
 jobs.sort(key=lambda j: j["when"], reverse=True)
 
 
+for n in news:
+    n["path"] = f"news/{slug(n['title'])[:70].strip('-')}/"
+
+
 def pscore(p):
     """Emerging-first score. The same rules are printed on the Top 10 pages."""
     s = {"S": 3, "B": 1.5, "G": 0}[p["kind"]]
@@ -131,7 +135,7 @@ def filters(items, show=("region", "country", "area", "contract", "type")):
 
 
 def extras(root):
-    mini = "".join(f'<li><a href="{e(n["url"])}" target="_blank" rel="noopener nofollow">{e(n["title"])}</a><span>{nice(n["date"])} · {e(n["tag"])}</span></li>' for n in news[:3])
+    mini = "".join(f'<li><a href="{root}{n["path"]}">{e(n["title"])}</a><span>{nice(n["date"])} · {e(n["tag"])}</span></li>' for n in news[:3])
     return (f'<aside class="extras"><div class="note accent"><h3>IFS freelancer?</h3><p class="small">Get featured on this board so partners and customers can find you. It\'s free.</p>'
             f'<a class="small" href="{root}freelancers/">Get featured &rarr;</a></div>'
             f'<div class="note"><h3>What\'s new in IFS</h3><ul>{mini}</ul><a class="small" href="{root}news/">All updates &rarr;</a></div></aside>')
@@ -142,6 +146,14 @@ def tags_for(p):
            '<span class="tag v">Emerging</span>' if p["kind"] != "G" and p.get("sig") else "",
            f'<span class="tag">Founded {p["founded"]}</span>' if p.get("founded") else ""]
     return "".join(out)
+
+
+def btns(p, root, profile=True):
+    out = [f'<a class="pbtn primary" href="{root}{p["path"]}">View profile<span aria-hidden="true">&rarr;</span></a>'] if profile else []
+    for url, label in ((p.get("web"), "Website"), (p.get("careers"), "Careers")):
+        if str(url or "").startswith("https://"):
+            out.append(f'<a class="pbtn" href="{e(url)}" target="_blank" rel="noopener nofollow">{label}<span aria-hidden="true">&nearr;</span></a>')
+    return '<div class="btns">' + "".join(out) + "</div>"
 
 
 def faq(items):
@@ -180,7 +192,7 @@ def page(path, title, desc, body, active="", ld=(), crumbs=(), priority="0.6", l
             f'<meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{e(url)}">'
             f'<meta property="og:type" content="website"><meta property="og:site_name" content="findifsjobs"><meta name="twitter:card" content="summary">'
             f'<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-            f'<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;800&display=swap">'
+            f'<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">'
             f'<link rel="stylesheet" href="{root}assets/site.css">'
             + "".join(f'<script type="application/ld+json">{json.dumps(x, ensure_ascii=False).replace("</", "<\\/")}</script>' for x in lds)
             + f'{ga_tag}</head><body data-form="{e(CFG.get("form_endpoint", ""))}">')
@@ -354,7 +366,7 @@ for p in sorted(partners, key=lambda p: (-p["score"], p["n"])):
               f'<div class="head">{logo(p["n"], "../", True)}<div class="body"><h3><a href="../{p["path"]}" style="color:var(--ink)">{e(p["n"])}</a></h3><p class="meta">{e(p["hq"])}</p></div></div>'
               f'<p class="sum">{e(p["blurb"])}</p><p class="kv"><b>Focus:</b> {e(p["focus"])}</p>'
               + (f'<p class="kv"><b>Size:</b> {e(p["size"])}</p>' if p.get("size") else "")
-              + f'<p class="kv"><b>Active in:</b> {", ".join(REG[x][0] for x in p["r"])}</p><div class="tags">{tags_for(p)}</div><div class="foot">{pl}</div></li>')
+              + f'<p class="kv"><b>Active in:</b> {", ".join(REG[x][0] for x in p["r"])}</p><div class="tags">{tags_for(p)}</div>{btns(p, "../")}</li>')
 toolbar = ('<div class="toolbar"><input type="search" class="plain" id="p-q" placeholder="Search partners, industries, cities" aria-label="Search partners">'
            f'<select id="p-region" aria-label="Region"><option value="">All regions</option>{"".join(f"""<option value="{k}">{v[0]}</option>""" for k, v in REG.items())}</select>'
            '<select id="p-kind" aria-label="Type"><option value="">All types</option><option value="S">IFS specialists</option><option value="B">ERP boutiques</option><option value="G">Global firms</option></select>'
@@ -390,28 +402,43 @@ METHOD = ('<p class="method"><b>How the ranking works.</b> Points for being IFS-
           'being founded since 2016 (1.5), IFS awards from 2023 to 2025 (1 each, up to 2), partner tier (Elite 1.5, Premier 1, Specialized 0.5) and a home base in the region (3). '
           'Facts come from the IFS partner directory, IFS press releases and each firm\'s own site. This is an editorial ranking by findifsjobs, not an IFS one.</p>')
 pills = lambda cur, root: '<div class="pills">' + "".join(f'<a class="pill" href="{root}top-ifs-partners/{v[2]}/"{" aria-pressed=\"true\"" if k == cur else ""}>{v[0]}</a>' for k, v in REG.items()) + "</div>"
+
+
+def pod(p, i, root):
+    return (f'<li class="pod{" first" if i == 0 else ""}"><span class="rk" aria-hidden="true">{i + 1:02d}</span>{logo(p["n"], root, True)}'
+            f'<h2><a href="{root}{p["path"]}">{e(p["n"])}</a></h2><p class="meta">{e(p["hq"])}{" · " + e(p["size"]) if p.get("size") else ""}</p>'
+            f'<p class="sum">{e(p.get("sig") or p["blurb"])}</p><div class="tags">{tags_for(p)}</div>{btns(p, root)}</li>')
+
+
+def rrow(p, i, root):
+    return (f'<li class="rrow"><span class="rk" aria-hidden="true">{i + 1:02d}</span>{logo(p["n"], root, True)}<div class="body"><h3><a href="{root}{p["path"]}">{e(p["n"])}</a></h3>'
+            f'<p class="meta">{e(p["hq"])}{" · " + e(p["size"]) if p.get("size") else ""}</p><p class="sum">{e(p.get("sig") or p["blurb"])}</p>'
+            f'{f"""<p class="kv"><b>Awards:</b> {e(p["awards"])}</p>""" if p.get("awards") else ""}<div class="tags">{tags_for(p)}</div></div>{btns(p, root)}</li>')
+
+
 for r, (short, long, rs) in REG.items():
     root = "../../"
-    rows = "".join(
-        f'<li class="row">{logo(p["n"], root)}<div class="body"><h3><a href="{root}{p["path"]}">{e(p["n"])}</a></h3><p class="meta">{e(p["hq"])}{" · " + e(p["size"]) if p.get("size") else ""}</p>'
-        f'<p class="sum">{e(p.get("sig") or p["blurb"])}</p>{f"""<p class="kv"><b>Awards:</b> {e(p["awards"])}</p>""" if p.get("awards") else ""}<div class="tags">{tags_for(p)}</div></div>'
-        f'<div class="side"><div class="links"><a href="{root}{p["path"]}">Profile</a>{ext(p.get("web"), "Website")}{ext(p.get("careers"), "Careers")}</div></div></li>' for p in top10[r])
-    names = ", ".join(p["n"] for p in top10[r][:5])
+    t = top10[r]
+    names = ", ".join(p["n"] for p in t[:5])
     block, fl = faq([(f"Who are the top IFS partners in {long}?", f"By findifsjobs' emerging-first ranking, the top five are {names}."),
                      (f"How is the ranking decided?", "Partners score points for IFS-only focus, recent growth signals, founding since 2016, IFS awards from 2023 to 2025, partner tier and a home base in the region. Global firms are listed but not favoured."),
                      ("Is this an official IFS ranking?", "No. It is an independent editorial ranking by findifsjobs, built from public facts.")])
     il = {"@context": "https://schema.org", "@type": "ItemList", "name": f"Top 10 IFS partners in {long}", "itemListElement": [
-        {"@type": "ListItem", "position": i + 1, "name": p["n"], "url": f"{SITE}/{p['path']}"} for i, p in enumerate(top10[r])]}
+        {"@type": "ListItem", "position": i + 1, "name": p["n"], "url": f"{SITE}/{p['path']}"} for i, p in enumerate(t)]}
     page(f"top-ifs-partners/{rs}/", f"Top 10 IFS partners in {long} (2026) | findifsjobs",
          f"The top 10 IFS implementation partners in {long}: {names} and more. Ranked on focus, growth, awards and tier, with the method shown.",
-         hero("Top 10 partners", f"Top 10 IFS partners in {e(long)}", "Ranked for people choosing where to work or who to hire. Specialists and fast-growing firms come first.")
-         + f'<div class="wrap">{pills(r, root)}<ol class="rows rank">{rows}</ol>{METHOD}{block}</div>',
+         hero("The 2026 ranking", f'Top 10 <em>IFS partners</em> in {e(long)}', "Ranked for people choosing where to work or who to hire. Specialists and fast-growing firms come first.", h1cls="mega")
+         + f'<div class="wrap">{pills(r, root)}<ol class="podium">{"".join(pod(p, i, root) for i, p in enumerate(t[:3]))}</ol>'
+           f'<ol class="rrows" start="4">{"".join(rrow(p, i + 3, root) for i, p in enumerate(t[3:]))}</ol>{METHOD}{block}</div>',
          active="top-ifs-partners/", ld=[il, fl], crumbs=[("Top 10 partners", "top-ifs-partners/"), (short, None)], priority="0.9")
-idx = "".join(f'<li class="cell"><h3><a href="{v[2]}/" style="color:var(--ink)">Top 10 IFS partners in {e(v[1])}</a></h3><p class="sum">{e(", ".join(p["n"] for p in top10[k][:4]))} and more.</p><div class="foot"><a href="{v[2]}/">See the list &rarr;</a></div></li>' for k, v in REG.items())
+idx = "".join(
+    f'<li><a class="tcard" href="{v[2]}/"><span class="ten" aria-hidden="true">10</span><span class="tk">Top 10 IFS partners</span><strong>{e(v[0])}</strong>'
+    f'<span class="lead">No. 1: {e(top10[k][0]["n"])}</span><span class="stackl">{"".join(logo(p["n"], "../") for p in top10[k][:5])}</span>'
+    f'<span class="go">See the ranking <i aria-hidden="true">&rarr;</i></span></a></li>' for k, v in REG.items())
 page("top-ifs-partners/", "Top 10 IFS partners by region (2026) | findifsjobs",
      "Top 10 IFS implementation partners in eight regions: USA and Canada, UK and Ireland, Nordics, DACH, Europe, Middle East and Africa, South Asia and Asia Pacific.",
-     hero("Top 10 partners", "Top 10 IFS partners by region", "Eight regional rankings. Specialists and fast-growing firms come first; the method is printed on every list.")
-     + f'<div class="wrap"><ul class="grid">{idx}</ul>{METHOD}</div>', active="top-ifs-partners/", crumbs=[("Top 10 partners", None)], priority="0.9")
+     hero("The 2026 ranking", "Top 10 <em>IFS partners</em>, region by region", "Eight rankings. Specialists and fast-growing firms come first, and the scoring is printed on every list.", h1cls="mega")
+     + f'<div class="wrap"><ul class="tgrid">{idx}</ul>{METHOD}</div>', active="top-ifs-partners/", crumbs=[("Top 10 partners", None)], priority="0.9")
 
 # ---- recruiters
 def rcell(r):
@@ -456,17 +483,35 @@ page("freelancers/", "IFS freelancers: get featured free | findifsjobs",
      f'{fl_form}<h2 style="font-size:1.1rem">Featured freelancers</h2><ul class="grid">{fl_cells}</ul></div>', active="freelancers/", crumbs=[("Freelancers", None)], priority="0.7")
 
 # ---- news
+def nart(n, big=False):
+    d = dt.date.fromisoformat(n["date"][:10])
+    return (f'<span class="nart t-{slug(n["tag"])}{" big" if big else ""}" aria-hidden="true"><b>{d.day}</b><i>{d.strftime("%b %Y")}</i><em>{e(n["tag"])}</em></span>')
+
+
+def ncard(n, root, feat=False):
+    return (f'<li class="ncard{" feat" if feat else ""}" data-tag="{e(n["tag"])}"><a href="{root}{n["path"]}">{nart(n)}<span class="nbody">'
+            f'<span class="tags"><span class="tag v">{e(n["tag"])}</span><span class="tag">{e(n["source"])}</span></span><strong>{e(n["title"])}</strong>'
+            f'<span class="sum">{e(n["summary"])}</span><span class="go">Read more <i aria-hidden="true">&rarr;</i></span></span></a></li>')
+
+
 tags = list(dict.fromkeys(n["tag"] for n in news))
-n_rows = "".join(
-    f'<li class="row" data-tag="{e(n["tag"])}" style="grid-template-columns:minmax(0,1fr) auto"><div class="body"><h3><a href="{e(n["url"])}" target="_blank" rel="noopener nofollow">{e(n["title"])}</a></h3>'
-    f'<p class="sum">{e(n["summary"])}</p><div class="tags"><span class="tag v">{e(n["tag"])}</span><span class="tag">{e(n["source"])}</span></div></div>'
-    f'<div class="side" style="grid-column:auto"><span class="newsdate">{nice(n["date"])}</span></div></li>' for n in news)
 n_pills = '<div class="pills" id="n-pills" role="group" aria-label="Topic"><button type="button" class="pill" data-t="" aria-pressed="true">All</button>' + "".join(f'<button type="button" class="pill" data-t="{e(t)}">{e(t)}</button>' for t in tags) + "</div>"
 page("news/", "What's new in the IFS space: releases, partners, customers | findifsjobs",
-     "Recent IFS news in one list: IFS Cloud releases, partner mergers and new partnerships, customer wins, company results and events. Each item links to its source.",
-     hero("What's new", "What's new in the IFS space", "Product releases, partner moves, customer wins and events. Each item links to its source.")
-     + f'<div class="wrap">{n_pills}<ul class="rows" id="n-list">{n_rows}</ul></div>', active="news/", crumbs=[("What's new", None)], priority="0.7",
-     lastmod=news[0]["date"] if news else None)
+     "Recent IFS news in one place: IFS Cloud releases, partner mergers and new partnerships, customer wins, company results and events. Each item links to its source.",
+     hero("What's new", "What's new in the <em>IFS space</em>", "Product releases, partner moves, customer wins and events. Each story links to its source.", h1cls="mega")
+     + f'<div class="wrap">{n_pills}<ul class="ngrid" id="n-list">{"".join(ncard(n, "../", i == 0) for i, n in enumerate(news))}</ul></div>',
+     active="news/", crumbs=[("What's new", None)], priority="0.7", lastmod=news[0]["date"] if news else None)
+for n in news:
+    more = [x for x in news if x is not n][:3]
+    page(n["path"], f"{n['title']} | findifsjobs", n["summary"],
+         hero(n["tag"], e(n["title"]), f'{nice(n["date"])} · Source: {e(n["source"])}', h1cls="small")
+         + f'<div class="wrap"><div class="article"><div class="stack">{nart(n, True)}<div class="prose"><p style="font-size:1.1rem">{e(n["summary"])}</p></div>'
+           f'<a class="btn bigbtn" href="{e(n["url"])}" target="_blank" rel="noopener nofollow">Read the full story at {e(n["source"])} &nearr;</a></div>'
+           f'<div class="stack"><div class="note"><h3>About this update</h3><p class="small">A short summary by findifsjobs. The full story and all figures are at the source.</p></div></div></div>'
+           f'<section class="stack"><h2>More updates</h2><ul class="ngrid">{"".join(ncard(x, "../../") for x in more)}</ul></section></div>',
+         active="news/", crumbs=[("What's new", "news/"), (n["title"], None)], priority="0.5", lastmod=n["date"][:10],
+         ld=[{"@context": "https://schema.org", "@type": "Article", "headline": n["title"], "datePublished": n["date"][:10], "description": n["summary"],
+              "author": {"@type": "Organization", "name": "findifsjobs"}, "isBasedOn": n["url"]}])
 
 # ---- hiring report
 def tbl(title, pairs, total=N):
@@ -479,11 +524,43 @@ rep_summary = (f"{N} open IFS roles from {employers_n} employers in {len(by_coun
 block, fl = faq([("How many IFS jobs are open worldwide?", f"{N} on findifsjobs as of {TODAY.strftime('%-d %B %Y')}, from {employers_n} employers."),
                  ("What share of IFS jobs ask for IFS Cloud?", f"{cloud_n * 100 // N}% of listings name IFS Cloud ({cloud_n} of {N})."),
                  ("What share of IFS jobs are remote or hybrid?", f"{remote_n * 100 // N}% ({remote_n} of {N}).")])
+
+
+def ring(pct):
+    c = 2 * 3.14159 * 26
+    return (f'<svg class="ring" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><circle cx="32" cy="32" r="26" fill="none" stroke="var(--line)" stroke-width="6"/>'
+            f'<circle cx="32" cy="32" r="26" fill="none" stroke="var(--brand)" stroke-width="6" stroke-linecap="round" stroke-dasharray="{c * pct / 100:.1f} {c:.1f}" transform="rotate(-90 32 32)"/></svg>')
+
+
+def bars(key, title, pairs, first=False):
+    mx = max(v for _, v in pairs)
+    rows = "".join(
+        f'<li class="bar" tabindex="0" data-tip="{e(k)}: {plural(v, "open role")}, {v * 100 // N}% of all listings"><span class="bl">{e(k)}</span>'
+        f'<span class="bt"><i style="--w:{v * 100 / mx:.1f}%"></i></span><span class="bv">{v}</span><span class="bp">{v * 100 // N}%</span></li>' for k, v in pairs)
+    return f'<div class="chart{" in" if first else ""}" id="c-{key}"{"" if first else " hidden"}><ol class="barlist" aria-label="{e(title)}">{rows}</ol></div>'
+
+
+CHARTS = [("country", "By country", "Open IFS roles by country", by_country[:12]), ("area", "By module", "Open IFS roles by module", by_area),
+          ("region", "By region", "Open IFS roles by region", by_region), ("type", "By employer type", "Open IFS roles by employer type", by_type),
+          ("employer", "Top employers", "Employers with the most open IFS roles", by_employer)]
+cloud_pct, remote_pct = cloud_n * 100 // N, remote_n * 100 // N
+tiles = (f'<ul class="tiles"><li><b>{N}</b><span>open IFS roles</span></li><li><b>{employers_n}</b><span>employers hiring</span></li><li><b>{len(by_country)}</b><span>countries</span></li>'
+         f'<li class="withring">{ring(cloud_pct)}<div><b>{cloud_pct}%</b><span>name IFS Cloud</span></div></li><li class="withring">{ring(remote_pct)}<div><b>{remote_pct}%</b><span>remote or hybrid</span></div></li></ul>')
+takeaways = (f'<ul class="takes"><li><span>Busiest country</span><strong>{e(by_country[0][0])}</strong><em>{by_country[0][1]} open roles</em></li>'
+             f'<li><span>Busiest module</span><strong>{e(by_area[0][0])}</strong><em>{by_area[0][1]} open roles</em></li>'
+             f'<li><span>Biggest hirer</span><strong>{e(by_employer[0][0])}</strong><em>{by_employer[0][1]} open roles</em></li></ul>')
+chart_tabs = '<div class="pills" id="c-tabs" role="group" aria-label="Break the roles down by">' + "".join(
+    f'<button type="button" class="pill" data-c="{k}" data-title="{e(t)}" aria-pressed="{"true" if i == 0 else "false"}">{e(lbl)}</button>' for i, (k, lbl, t, _) in enumerate(CHARTS)) + "</div>"
+chart_box = (f'<section class="chartbox"><div class="chead"><h2 id="c-title">{e(CHARTS[0][2])}</h2>{chart_tabs}</div>'
+             + "".join(bars(k, t, pairs, i == 0) for i, (k, _, t, pairs) in enumerate(CHARTS))
+             + '<p class="muted small">Bars show open roles. The percentage is the share of all listings on the board. Hover or tap a bar for detail.</p></section>')
 page("ifs-hiring-report/", f"IFS hiring report, {MONTH}: {N} open roles by country and module | findifsjobs",
      f"IFS job market snapshot for {MONTH}: {rep_summary}",
-     hero("Hiring report", f"IFS hiring report, {MONTH}", e(rep_summary))
-     + f'<div class="wrap"><p class="muted small">Based on every listing on findifsjobs on {TODAY.strftime("%-d %B %Y")}. The board covers public careers pages of IFS, partners, customers and recruiters, so it is a sample of the market, not a census. Free to quote with a link to this page.</p>'
+     hero("Hiring report", f"IFS hiring report, <em>{MONTH}</em>", e(rep_summary), h1cls="mega")
+     + f'<div class="wrap">{tiles}{takeaways}{chart_box}'
+     + f'<details class="tview"><summary>View the data as tables</summary><div class="stack" style="margin-top:18px">'
      + tbl("By region", by_region) + tbl("By country", by_country[:12]) + tbl("By module / area", by_area) + tbl("By employer type", by_type) + tbl("Employers with the most open roles", by_employer)
+     + f'</div></details><p class="muted small">Based on every listing on findifsjobs on {TODAY.strftime("%-d %B %Y")}. The board covers public careers pages of IFS, partners, customers and recruiters, so it is a sample of the market, not a census. Free to quote with a link to this page.</p>'
      + f'{block}</div>', active="ifs-hiring-report/", ld=[fl], crumbs=[("Hiring report", None)], priority="0.9")
 
 # ---- hire, about, 404
