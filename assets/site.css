@@ -283,3 +283,5 @@ a:hover .go i{transform:translateX(5px)}
 .tgrid li{display:flex}.tcard{flex:1}
 .pod h2,.pod h2 a{font-weight:800}
 .rrow h3 a{font-weight:700}
+
+.pod .pick{display:inline-block;margin:.35rem 0 0;padding:.15rem .6rem;border-radius:999px;background:var(--brand-soft);color:var(--brand);font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
