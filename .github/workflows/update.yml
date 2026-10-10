@@ -73,6 +73,6 @@ jobs:
         run: |
           sleep 20
           python indexnow.py | tee indexnow_status.txt
-          git add indexnow_sent.txt indexnow_status.txt 2>/dev/null || true
+          git add indexnow_status.txt; git add indexnow_sent.txt 2>/dev/null || true
           git diff --cached --quiet || git commit -m "IndexNow: record submitted pages"
           git pull -q --rebase && git push || true
