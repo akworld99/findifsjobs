@@ -216,7 +216,8 @@
   "icon": "logos/icon/krish-it-solutions.png"
  },
  "l-systems": {
-  "wide": "logos/wide/l-systems.png"
+  "wide": "logos/wide/l-systems.png",
+  "icon": "logos/icon/l-systems.ico"
  },
  "muzulu": {
   "wide": "logos/wide/muzulu.png",
