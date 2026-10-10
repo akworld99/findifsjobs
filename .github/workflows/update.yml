@@ -8,7 +8,7 @@ on:
   workflow_dispatch:        # lets you press "Run workflow" by hand
   push:
     branches: [main]
-    paths-ignore: ["jobs.json", "last_run.txt", "logos/**"]   # the bot's own data commit must not trigger another run
+    paths-ignore: ["jobs.json", "last_run.txt", "logos/**", "domain_status.txt"]   # the bot's own data commit must not trigger another run
 
 permissions:
   contents: write   # commit the refreshed jobs.json
@@ -45,11 +45,20 @@ jobs:
       - name: Build the site
         run: python build.py
 
+      - name: Point the custom domain at this site
+        # One-off helper: safe to keep, it only sets the domain named in site.json.
+        run: |
+          DOMAIN=$(python -c "import json;print(json.load(open('site.json'))['url'].split('//')[1])")
+          gh api -X PUT "repos/${{ github.repository }}/pages" -f cname="$DOMAIN" && echo "domain set: $DOMAIN" > domain_status.txt || echo "could not set domain from the workflow" > domain_status.txt
+          gh api "repos/${{ github.repository }}/pages" --jq '{cname, https_enforced, status}' >> domain_status.txt 2>&1 || true
+        env:
+          GH_TOKEN: ${{ github.token }}
+
       - name: Save the refreshed job list
         run: |
           git config user.name "findifsjobs-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add jobs.json last_run.txt logos
+          git add jobs.json last_run.txt logos domain_status.txt
           git diff --cached --quiet || git commit -m "Daily job refresh"
           git push
 
