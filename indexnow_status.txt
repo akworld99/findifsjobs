@@ -1,1 +1,1 @@
-IndexNow: sent 307 addresses, status 200
+IndexNow: nothing new to send
