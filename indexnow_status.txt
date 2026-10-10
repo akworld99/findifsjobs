@@ -1,0 +1,1 @@
+IndexNow: not accepted (HTTP Error 403: Forbidden); will retry on the next run
