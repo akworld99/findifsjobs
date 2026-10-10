@@ -1,0 +1,179 @@
+{
+ "month": "2026-10",
+ "as_of": "2026-10-10",
+ "roles": 155,
+ "employers": 39,
+ "countries": 22,
+ "cloud": 57,
+ "remote": 55,
+ "by_area": [
+  [
+   "Architecture",
+   27
+  ],
+  [
+   "Technical / Development",
+   26
+  ],
+  [
+   "Multi-module",
+   20
+  ],
+  [
+   "Finance",
+   18
+  ],
+  [
+   "Manufacturing",
+   10
+  ],
+  [
+   "Project Management",
+   10
+  ],
+  [
+   "EAM / Maintenance",
+   9
+  ],
+  [
+   "Support / Admin",
+   8
+  ],
+  [
+   "Supply Chain",
+   8
+  ],
+  [
+   "Field Service",
+   6
+  ]
+ ],
+ "by_country": [
+  [
+   "United States",
+   25
+  ],
+  [
+   "Sri Lanka",
+   19
+  ],
+  [
+   "Sweden",
+   15
+  ],
+  [
+   "United Kingdom",
+   11
+  ],
+  [
+   "Japan",
+   10
+  ],
+  [
+   "Australia",
+   9
+  ],
+  [
+   "Netherlands",
+   6
+  ],
+  [
+   "Switzerland",
+   5
+  ],
+  [
+   "India",
+   4
+  ],
+  [
+   "Austria",
+   4
+  ]
+ ],
+ "by_employer": [
+  [
+   "IFS",
+   44
+  ],
+  [
+   "Arcwide",
+   22
+  ],
+  [
+   "IT Works Recruitment",
+   9
+  ],
+  [
+   "Cubiq Recruitment",
+   8
+  ],
+  [
+   "InfoConsulting",
+   7
+  ],
+  [
+   "GoLive Recruitment",
+   6
+  ],
+  [
+   "WIA Systems",
+   5
+  ],
+  [
+   "Novacura",
+   5
+  ],
+  [
+   "Eqeep",
+   4
+  ],
+  [
+   "Cegeka",
+   3
+  ]
+ ],
+ "by_type": [
+  [
+   "IFS partner",
+   70
+  ],
+  [
+   "IFS vendor",
+   44
+  ],
+  [
+   "Recruiter",
+   31
+  ],
+  [
+   "IFS customer",
+   9
+  ],
+  [
+   "IT services firm",
+   1
+  ]
+ ],
+ "role_mix": [
+  [
+   "Functional consultant",
+   67
+  ],
+  [
+   "Technical and developer",
+   26
+  ],
+  [
+   "Solution architect",
+   27
+  ],
+  [
+   "Project manager",
+   10
+  ],
+  [
+   "Support",
+   8
+  ]
+ ]
+}
