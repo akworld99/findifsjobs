@@ -1,4 +1,4 @@
-Run 2026-10-10 05:33 UTC, 125 jobs on the board
+Run 2026-10-10 05:35 UTC, 153 jobs on the board
 
 IFS                   smartrecruiters   45 jobs
 Arcwide               teamtailor        22 jobs
@@ -7,27 +7,14 @@ Addovation            teamtailor         0 jobs
 InfoConsulting        recruitee          7 jobs
 Eqeep                 smartrecruiters    4 jobs
 Inivos                workable           3 jobs
-Tsunami Tsolutions    breezy             0 jobs
-    WIA Systems: page 184351 chars, 82 links, 8 job-like; sample [('https://www.wiasystems.com/careers/vacancy-technical-consultant-ifs', 'Read More'), ('https://www.wiasystems.com/careers/vacancy-lead-technical-consultant-ifs', 'Read More'), ('https://www.wiasystems.com/careers/vacancy-ifs-project-manager-sri-lanka', 'Read More'), ('https://www.wiasystems.com/careers/siemens-opcenter-integrations-developer', 'Read More'), ('https://www.wiasystems.com/careers/vacancy-lead-manufacturing-consultant', 'Read More'), ('https://www.wiasystems.com/careers/vacancy-ifs-erp-sales-manager-us', 'Read More')]
-WIA Systems           html               0 jobs
-    Platned: page 26196 chars, 0 links, 0 job-like; sample []
-Platned               html               0 jobs
-    Enterprise Analytics: page 56750 chars, 76 links, 12 job-like; sample [('https://e-analytics.com/careers/enterprise-account-executive---installed-base-uk', 'Apply Now'), ('https://e-analytics.com/careers/enterprise-account-executive---new-business-uk', 'Apply Now'), ('https://e-analytics.com/careers/senior-business-development-executive---anz', 'Apply Now'), ('https://e-analytics.com/careers/functional-consultant---human-capital-management-in-ifs', 'Apply Now'), ('https://e-analytics.com/careers/senior-functional-consultant---scm-in-ifs', 'Apply Now'), ('https://e-analytics.com/careers/manager---functional-consulting---uk', 'Apply Now')]
-Enterprise Analytics  html               0 jobs
-    Kaizens Group: page 105799 chars, 36 links, 6 job-like; sample [('https://kaizens.co.uk/careers/senior-ifs-supply-chain-consultant', 'Find Out'), ('https://kaizens.co.uk/careers/senior-ifs-software-engineer', 'Find Out'), ('https://kaizens.co.uk/careers/erp-project-manager', 'Find Out'), ('https://kaizens.co.uk/careers/ifs-technical-consultant', 'Find Out'), ('https://kaizens.co.uk/careers/hr-and-administration-intern-trainee', 'Find Out'), ('https://kaizens.co.uk/careers/full-stack-developer', 'Find Out')]
-Kaizens Group         html               0 jobs
-Iconique              html               1 jobs
-    Xitricon: page 258038 chars, 84 links, 6 job-like; sample [('https://xitricon.com/career/ai-engineer/', 'Apply'), ('https://xitricon.com/career/lead-ai-engineer/', 'Apply'), ('https://xitricon.com/career/presales-specialist/', 'Apply'), ('https://xitricon.com/career/ifs-pso-consultant/', 'Apply'), ('https://xitricon.com/career/erp-consulting-manager-project-manager/', 'Apply'), ('https://xitricon.com/career/assistant-manager-sales-bdr/', 'Apply')]
-Xitricon              html               0 jobs
+Tsunami Tsolutions    breezy             1 jobs
+WIA Systems           html               5 jobs
+Enterprise Analytics  html               3 jobs
+Kaizens Group         html               3 jobs
+Iconique              html               2 jobs
+Xitricon              html               1 jobs
 12Guide               html               3 jobs
-    Covalent Systems: page 179 chars, 0 links, 0 job-like; sample []
-Covalent Systems      html               0 jobs
 Solika Consulting     html               1 jobs
-    FLEXiCODE: page 314041 chars, 49 links, 0 job-like; sample []
-FLEXiCODE             html               0 jobs
 BW Energy             workable           1 jobs
-GoLive Recruitment    wprss           FAILED  XML or text declaration not at start of entity: line 7, column 0
-    Cubiq Recruitment: page 249566 chars, 100 links, 16 job-like; sample [('https://www.cubiqrecruitment.com/jobs/firmware-design-engineer/', 'Software Firmware Design Engineer Develop embedded firmware '), ('https://www.cubiqrecruitment.com/jobs/platform-engineer/', 'Software Platform Engineer A rapidly scaling biotech company'), ('https://www.cubiqrecruitment.com/jobs/technical-program-manager/', 'Product Technical Program Manager By combining a proprietary'), ('https://www.cubiqrecruitment.com/jobs/software-engineer/', 'Software Software Engineer Join this fast-growing London-bas'), ('https://www.cubiqrecruitment.com/jobs/senior-ifs-erp-functional-consultant-hcm/', 'Senior IFS ERP Functional Consultant (HCM) US-based function'), ('https://www.cubiqrecruitment.com/jobs/ifs-technical-consultant/', 'IFS Technical Consultant Take technical ownership of an in-h')]
-Cubiq Recruitment     html               0 jobs
-    IT Works Recruitment: page 48427 chars, 17 links, 0 job-like; sample []
-IT Works Recruitment  html               0 jobs
+GoLive Recruitment    wprss              7 jobs
+Cubiq Recruitment     html               8 jobs
