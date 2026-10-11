@@ -1,4 +1,4 @@
-Run 2026-10-11 01:44 UTC, 155 jobs on the board
+Run 2026-10-11 13:40 UTC, 155 jobs on the board
 
 IFS                   smartrecruiters   47 jobs
 Arcwide               teamtailor        22 jobs
@@ -8,7 +8,7 @@ InfoConsulting        recruitee          7 jobs
 Eqeep                 smartrecruiters    4 jobs
 Inivos                workable           3 jobs
 Tsunami Tsolutions    breezy             1 jobs
-WIA Systems           html               5 jobs
+WIA Systems           html            FAILED  <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)>
 Enterprise Analytics  html               3 jobs
 Kaizens Group         html               3 jobs
 Iconique              html               2 jobs
