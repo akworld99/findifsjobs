@@ -217,6 +217,7 @@ def page(path, title, desc, body, active="", ld=(), crumbs=(), priority="0.6", l
             f'<meta property="og:type" content="website"><meta property="og:site_name" content="findifsjobs"><meta name="twitter:card" content="summary">'
             f'<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
             f'<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">'
+            f'<link rel="icon" href="{root}favicon.ico" sizes="48x48"><link rel="icon" href="{root}favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="{root}apple-touch-icon.png">'
             f'<link rel="stylesheet" href="{root}assets/site.css">'
             + "".join(f'<script type="application/ld+json">{json.dumps(x, ensure_ascii=False).replace("</", "<\\/")}</script>' for x in lds)
             + f'{ga_tag}</head><body data-form="{e(CFG.get("form_endpoint", ""))}">')
@@ -273,6 +274,8 @@ if OUT.exists():
 (OUT / "assets").mkdir(parents=True)
 for f in ("site.css", "site.js"):
     shutil.copy(HERE / "assets" / f, OUT / "assets" / f)
+for f in ("favicon.ico", "favicon.svg", "apple-touch-icon.png"):   # at the site root, where browsers and Google look first
+    shutil.copy(HERE / "assets" / f, OUT / f)
 if (HERE / "logos").exists():
     shutil.copytree(HERE / "logos", OUT / "logos", ignore=shutil.ignore_patterns("*.txt", "manifest.json"))
 
