@@ -371,7 +371,7 @@ for j in jobs:
               "hiringOrganization": {"@type": "Organization", "name": j["company"], **({"sameAs": partner["web"]} if partner and partner.get("web") else {})},
               "jobLocation": {"@type": "Place", "address": {"@type": "PostalAddress", "addressCountry": j["country"],
                                                             **({"addressLocality": j["city"]} if known(j.get("city")) and j["city"] != "Remote" else {}),
-                                                            **({"addressRegion": j["region"]} if j.get("region") else {}),
+                                                            **({"addressRegion": j["state"]} if j.get("state") else {}),
                                                             **({"postalCode": j["postal"]} if j.get("postal") else {}),
                                                             **({"streetAddress": j["street"]} if j.get("street") else {})}},
               "industry": "Enterprise software (IFS ERP)", "occupationalCategory": j.get("area") or "IFS"}

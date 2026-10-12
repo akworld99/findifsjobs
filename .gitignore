@@ -1,2 +1,3 @@
 site/
 urls.txt
+__pycache__/

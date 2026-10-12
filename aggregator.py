@@ -265,7 +265,7 @@ def fetch_smartrecruiters(cid, name, ctype, ifs_only):
                                     f"https://jobs.smartrecruiters.com/{cid}/{p['id']}", dept,
                                     p.get("releasedDate"), loc.get("remote"),
                                     (p.get("typeOfEmployment") or {}).get("label"), detail=detail,
-                                    addr={"region": loc.get("region"), "postal": loc.get("postalCode"), "street": loc.get("address")}))
+                                    addr={"state": loc.get("region"), "postal": loc.get("postalCode"), "street": loc.get("address")}))
         offset += 100
         if offset >= d.get("totalFound", 0):
             return out
@@ -299,7 +299,7 @@ def fetch_recruitee(slug, name, ctype, ifs_only):
         if is_ifs_job(o.get("title", ""), text, ifs_only):
             out.append(make_job(o["title"], name, ctype, o.get("city"), o.get("country"), o.get("careers_url"),
                                 text, o.get("published_at"), o.get("remote"), o.get("employment_type_code"), detail=text,
-                                addr={"region": o.get("state_name") or o.get("state"), "postal": o.get("postal_code")}))
+                                addr={"state": o.get("state_name") or o.get("state"), "postal": o.get("postal_code")}))
     return out
 
 
@@ -311,7 +311,7 @@ def fetch_workable(slug, name, ctype, ifs_only):
         if is_ifs_job(j.get("title", ""), text, ifs_only):
             out.append(make_job(j["title"], name, ctype, j.get("city"), j.get("country"), j.get("url"),
                                 text, j.get("published_on"), j.get("telecommuting"), j.get("employment_type"), detail=text,
-                                addr={"region": j.get("state")}))
+                                addr={"state": j.get("state")}))
     return out
 
 
@@ -453,7 +453,7 @@ def merge(existing, fresh):
         k = urls.get(j.get("url")) or key(j)
         if k in by:
             by[k]["last_seen"] = TODAY
-            for f in ("excerpt", "region", "postal", "street"):
+            for f in ("excerpt", "state", "postal", "street"):
                 if j.get(f):
                     by[k][f] = j[f]
         else:
@@ -509,6 +509,8 @@ def selftest():
            ("Field Service", "IFS Cloud", "Hybrid", "Contract", "Senior", "EMEA"), t
     assert t["pay"] and "600" in t["pay"], t
     assert tag("IFS Developer", "PL/SQL, Apps 10", "Sri Lanka")["region"] == "APAC"
+    j = make_job("IFS Consultant", "X", "IFS partner", "Leeds", "United Kingdom", "https://x", addr={"state": "England"})
+    assert j["region"] == "EMEA" and j["state"] == "England"
     a = make_job("IFS Developer", "Acme", "IFS customer", "Leeds", "United Kingdom", "https://x/1")
     b = make_job("IFS  developer", "ACME", "IFS customer", "Leeds", "United Kingdom", "https://x/2")
     assert len(merge([], [a, b])) == 1
