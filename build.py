@@ -311,6 +311,31 @@ page("", f"IFS Consultant Jobs: {N} open IFS Cloud, ERP, EAM and FSM jobs | find
 
 # ---- job pages
 EMP = {"Contract": "CONTRACTOR", "Permanent": "FULL_TIME", "Fixed term": "TEMPORARY"}
+CUR_SYM = {"£": "GBP", "€": "EUR", "₹": "INR", "RM": "MYR"}
+DOLLAR = {"Canada": "CAD", "Australia": "AUD", "Singapore": "SGD", "New Zealand": "NZD"}
+
+
+def salary(pay, country):
+    """Turn the pay line from the advert into schema.org baseSalary. Returns None when it can't be read safely."""
+    if not pay:
+        return None
+    cur = next((c for s, c in CUR_SYM.items() if s in pay), None) or (DOLLAR.get(country, "USD") if "$" in pay else None)
+    lakh = bool(re.search(r"\d\s*L\b", pay))
+    nums = [float(n.replace(",", "")) * (100000 if lakh else 1) for n in re.findall(r"\d[\d,]*(?:\.\d+)?", pay)]
+    unit = next((u for w, u in (("hour", "HOUR"), ("day", "DAY"), ("week", "WEEK"), ("month", "MONTH"), ("year", "YEAR"), ("annum", "YEAR")) if w in pay.lower()), None)
+    if not cur or not nums:
+        return None
+    if not unit:
+        if min(nums) < 20000:   # too low to be sure it is annual; leave it out rather than guess
+            return None
+        unit = "YEAR"
+    if re.search(r"up to", pay, re.I):
+        val = {"maxValue": max(nums)}
+    elif len(nums) >= 2:
+        val = {"minValue": min(nums[:2]), "maxValue": max(nums[:2])}
+    else:
+        val = {"value": nums[0]}
+    return {"@type": "MonetaryAmount", "currency": cur, "value": {"@type": "QuantitativeValue", **val, "unitText": unit}}
 for j in jobs:
     root = "../../"
     facts = [("Employer", j["company"]), ("Employer type", j.get("company_type")), ("Location", j["loc"]),
@@ -345,10 +370,16 @@ for j in jobs:
               "datePosted": j["when"][:10], "validThrough": valid, "directApply": False, "url": f"{SITE}/{j['path']}",
               "hiringOrganization": {"@type": "Organization", "name": j["company"], **({"sameAs": partner["web"]} if partner and partner.get("web") else {})},
               "jobLocation": {"@type": "Place", "address": {"@type": "PostalAddress", "addressCountry": j["country"],
-                                                            **({"addressLocality": j["city"]} if known(j.get("city")) and j["city"] != "Remote" else {})}},
+                                                            **({"addressLocality": j["city"]} if known(j.get("city")) and j["city"] != "Remote" else {}),
+                                                            **({"addressRegion": j["region"]} if j.get("region") else {}),
+                                                            **({"postalCode": j["postal"]} if j.get("postal") else {}),
+                                                            **({"streetAddress": j["street"]} if j.get("street") else {})}},
               "industry": "Enterprise software (IFS ERP)", "occupationalCategory": j.get("area") or "IFS"}
         if j.get("contract_type") in EMP:
             jp["employmentType"] = EMP[j["contract_type"]]
+        sal = salary(j.get("pay"), j.get("country"))
+        if sal:
+            jp["baseSalary"] = sal
         if j.get("work_mode") == "Remote":
             jp["jobLocationType"] = "TELECOMMUTE"
             jp["applicantLocationRequirements"] = {"@type": "Country", "name": j["country"]}

@@ -222,7 +222,7 @@ def excerpt(text, limit=900):
     return cut[:end + 1] if end > limit * 0.5 else cut.rsplit(" ", 1)[0] + " ..."
 
 
-def make_job(title, company, ctype, city, country, url, text="", posted=None, remote=None, employment=None, detail=None):
+def make_job(title, company, ctype, city, country, url, text="", posted=None, remote=None, employment=None, detail=None, addr=None):
     t = tag(title, text, country, remote, employment)
     bits = [t["seniority"] if t["seniority"] != "Not stated" else "", t["area"], "role at", company]
     where = ", ".join(x for x in (city, country) if x)
@@ -233,6 +233,8 @@ def make_job(title, company, ctype, city, country, url, text="", posted=None, re
         # Our own one-line summary. We do not republish the advertiser's description.
         "summary": " ".join(b for b in bits if b) + (f" in {where}." if where else "."),
         "excerpt": excerpt(detail),
+        # Address parts only when the employer's own feed gives them; never guessed.
+        **{k: str(v).strip() for k, v in (addr or {}).items() if v and str(v).strip()},
     }
 
 
@@ -262,7 +264,8 @@ def fetch_smartrecruiters(cid, name, ctype, ifs_only):
                                     or loc.get("country", "").upper(),
                                     f"https://jobs.smartrecruiters.com/{cid}/{p['id']}", dept,
                                     p.get("releasedDate"), loc.get("remote"),
-                                    (p.get("typeOfEmployment") or {}).get("label"), detail=detail))
+                                    (p.get("typeOfEmployment") or {}).get("label"), detail=detail,
+                                    addr={"region": loc.get("region"), "postal": loc.get("postalCode"), "street": loc.get("address")}))
         offset += 100
         if offset >= d.get("totalFound", 0):
             return out
@@ -295,7 +298,8 @@ def fetch_recruitee(slug, name, ctype, ifs_only):
         text = strip_html(o.get("description", "") + " " + o.get("requirements", ""))
         if is_ifs_job(o.get("title", ""), text, ifs_only):
             out.append(make_job(o["title"], name, ctype, o.get("city"), o.get("country"), o.get("careers_url"),
-                                text, o.get("published_at"), o.get("remote"), o.get("employment_type_code"), detail=text))
+                                text, o.get("published_at"), o.get("remote"), o.get("employment_type_code"), detail=text,
+                                addr={"region": o.get("state_name") or o.get("state"), "postal": o.get("postal_code")}))
     return out
 
 
@@ -306,7 +310,8 @@ def fetch_workable(slug, name, ctype, ifs_only):
         text = strip_html(j.get("description", ""))
         if is_ifs_job(j.get("title", ""), text, ifs_only):
             out.append(make_job(j["title"], name, ctype, j.get("city"), j.get("country"), j.get("url"),
-                                text, j.get("published_on"), j.get("telecommuting"), j.get("employment_type"), detail=text))
+                                text, j.get("published_on"), j.get("telecommuting"), j.get("employment_type"), detail=text,
+                                addr={"region": j.get("state")}))
     return out
 
 
@@ -448,8 +453,9 @@ def merge(existing, fresh):
         k = urls.get(j.get("url")) or key(j)
         if k in by:
             by[k]["last_seen"] = TODAY
-            if j.get("excerpt"):
-                by[k]["excerpt"] = j["excerpt"]
+            for f in ("excerpt", "region", "postal", "street"):
+                if j.get(f):
+                    by[k][f] = j[f]
         else:
             by[k] = {**j, "first_seen": TODAY, "last_seen": TODAY}
     cutoff = (dt.date.today() - dt.timedelta(days=EXPIRE_DAYS)).isoformat()
