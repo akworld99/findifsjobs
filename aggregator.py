@@ -99,7 +99,7 @@ VENDOR_ROLES = re.compile(
     r"support (engineer|analyst|specialist|consultant)|application support|technical consultant", re.I)
 VENDOR_SKIP = re.compile(
     r"software engineer|full stack|security|legal|credit|treasury|IT support|platform engineer|applied ai|"
-    r"copperleaf|loops|recruit|marketing|finance systems|payroll|talent", re.I)
+    r"copperleaf|loops|recruit|marketing|finance systems|payroll|talent|account (executive|manager|director)|sales (director|manager|executive)", re.I)
 
 
 def is_ifs_job(title, text, ifs_only=False):

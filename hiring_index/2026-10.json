@@ -1,11 +1,11 @@
 {
  "month": "2026-10",
  "as_of": "2026-10-13",
- "roles": 156,
+ "roles": 150,
  "employers": 39,
  "countries": 22,
  "cloud": 57,
- "remote": 56,
+ "remote": 51,
  "by_area": [
   [
    "Architecture",
@@ -44,14 +44,14 @@
    8
   ],
   [
-   "Sales / Presales",
-   7
+   "Field Service",
+   4
   ]
  ],
  "by_country": [
   [
    "United States",
-   26
+   21
   ],
   [
    "Sri Lanka",
@@ -66,11 +66,11 @@
    11
   ],
   [
-   "Japan",
-   10
+   "Australia",
+   9
   ],
   [
-   "Australia",
+   "Japan",
    9
   ],
   [
@@ -93,7 +93,7 @@
  "by_employer": [
   [
    "IFS",
-   45
+   39
   ],
   [
    "Arcwide",
@@ -139,7 +139,7 @@
   ],
   [
    "IFS vendor",
-   45
+   39
   ],
   [
    "Recruiter",
