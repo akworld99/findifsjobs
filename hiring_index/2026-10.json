@@ -1,11 +1,11 @@
 {
  "month": "2026-10",
- "as_of": "2026-10-12",
- "roles": 155,
+ "as_of": "2026-10-13",
+ "roles": 156,
  "employers": 39,
  "countries": 22,
  "cloud": 57,
- "remote": 55,
+ "remote": 56,
  "by_area": [
   [
    "Architecture",
@@ -44,14 +44,14 @@
    8
   ],
   [
-   "Field Service",
-   6
+   "Sales / Presales",
+   7
   ]
  ],
  "by_country": [
   [
    "United States",
-   25
+   26
   ],
   [
    "Sri Lanka",
@@ -93,7 +93,7 @@
  "by_employer": [
   [
    "IFS",
-   44
+   45
   ],
   [
    "Arcwide",
@@ -139,7 +139,7 @@
   ],
   [
    "IFS vendor",
-   44
+   45
   ],
   [
    "Recruiter",
