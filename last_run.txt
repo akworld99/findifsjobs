@@ -1,4 +1,4 @@
-Run 2026-10-13 04:46 UTC, 150 jobs on the board
+Run 2026-10-14 01:58 UTC, 151 jobs on the board
 
 IFS                   smartrecruiters   36 jobs
 Arcwide               teamtailor        22 jobs
@@ -9,7 +9,7 @@ Eqeep                 smartrecruiters    4 jobs
 Inivos                workable           3 jobs
 Tsunami Tsolutions    breezy             1 jobs
 WIA Systems           html               5 jobs
-Enterprise Analytics  html               3 jobs
+Enterprise Analytics  html               2 jobs
 Kaizens Group         html               3 jobs
 Iconique              html               2 jobs
 Xitricon              html               1 jobs
