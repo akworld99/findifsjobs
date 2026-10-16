@@ -1,11 +1,11 @@
 {
  "month": "2026-10",
- "as_of": "2026-10-15",
- "roles": 151,
+ "as_of": "2026-10-16",
+ "roles": 152,
  "employers": 39,
  "countries": 22,
- "cloud": 57,
- "remote": 51,
+ "cloud": 58,
+ "remote": 52,
  "by_area": [
   [
    "Architecture",
@@ -21,7 +21,7 @@
   ],
   [
    "Finance",
-   18
+   19
   ],
   [
    "Manufacturing",
@@ -75,7 +75,7 @@
   ],
   [
    "Netherlands",
-   7
+   8
   ],
   [
    "Switzerland",
@@ -97,7 +97,7 @@
   ],
   [
    "Arcwide",
-   22
+   23
   ],
   [
    "IT Works Recruitment",
@@ -135,7 +135,7 @@
  "by_type": [
   [
    "IFS partner",
-   70
+   71
   ],
   [
    "IFS vendor",
@@ -157,7 +157,7 @@
  "role_mix": [
   [
    "Functional consultant",
-   67
+   68
   ],
   [
    "Technical and developer",
