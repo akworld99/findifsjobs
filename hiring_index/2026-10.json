@@ -1,7 +1,7 @@
 {
  "month": "2026-10",
- "as_of": "2026-10-16",
- "roles": 152,
+ "as_of": "2026-10-17",
+ "roles": 153,
  "employers": 39,
  "countries": 22,
  "cloud": 58,
@@ -16,12 +16,12 @@
    26
   ],
   [
-   "Multi-module",
+   "Finance",
    20
   ],
   [
-   "Finance",
-   19
+   "Multi-module",
+   20
   ],
   [
    "Manufacturing",
@@ -124,18 +124,18 @@
    5
   ],
   [
-   "Eqeep",
+   "Enterprise Analytics",
    4
   ],
   [
-   "Cegeka",
-   3
+   "Eqeep",
+   4
   ]
  ],
  "by_type": [
   [
    "IFS partner",
-   71
+   72
   ],
   [
    "IFS vendor",
@@ -157,7 +157,7 @@
  "role_mix": [
   [
    "Functional consultant",
-   68
+   69
   ],
   [
    "Technical and developer",
