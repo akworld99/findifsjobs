@@ -1,7 +1,7 @@
 {
  "month": "2026-10",
  "as_of": "2026-10-23",
- "roles": 156,
+ "roles": 158,
  "employers": 39,
  "countries": 22,
  "cloud": 59,
@@ -16,11 +16,11 @@
    26
   ],
   [
-   "Finance",
-   20
+   "Multi-module",
+   22
   ],
   [
-   "Multi-module",
+   "Finance",
    20
   ],
   [
@@ -59,11 +59,11 @@
   ],
   [
    "Sweden",
-   15
+   16
   ],
   [
    "United Kingdom",
-   12
+   13
   ],
   [
    "Netherlands",
@@ -93,7 +93,7 @@
  "by_employer": [
   [
    "IFS",
-   42
+   44
   ],
   [
    "Arcwide",
@@ -139,7 +139,7 @@
   ],
   [
    "IFS vendor",
-   42
+   44
   ],
   [
    "Recruiter",
