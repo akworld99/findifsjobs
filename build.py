@@ -31,7 +31,7 @@ partners, recruiters = load("partners.json", []), load("recruiters.json", [])
 news = sorted(load("news.json", []), key=lambda n: n["date"], reverse=True)
 freelancers, LOGOS = load("freelancers.json", []), load("logos/manifest.json", {})
 
-REG = {"NA": ("USA & Canada", "the USA and Canada", "usa-canada"), "UK": ("UK & Ireland", "the UK and Ireland", "uk-ireland"),
+REG = {"NA": ("USA & Canada", "North America", "usa-canada"), "UK": ("UK & Ireland", "the UK and Ireland", "uk-ireland"),
        "NORD": ("Nordics", "the Nordics", "nordics"), "DACH": ("DACH", "Germany, Austria and Switzerland", "dach"),
        "EU": ("Rest of Europe", "Benelux, France and the rest of Europe", "europe"),
        "MEA": ("Middle East & Africa", "the Middle East and Africa", "middle-east-africa"),
@@ -76,6 +76,7 @@ for _r, _n in PIN.items():
 countries = {c: n for c, n in Counter(j["country"] for j in jobs if known(j.get("country"))).items() if n >= 2}
 areas = {a: n for a, n in Counter(j["area"] for j in jobs if known(j.get("area"))).items() if n >= 3}
 cpath = lambda c: f"ifs-jobs/{slug(c)}/"
+CNAME = {"United States": "the USA", "United Kingdom": "the UK", "United Arab Emirates": "the UAE", "Netherlands": "the Netherlands"}
 apath = lambda a: f"ifs-jobs/{slug(a)}-jobs/"
 SPECIAL = {"remote": ("Remote and hybrid IFS jobs", lambda j: j["remote"], "ifs-jobs/remote/"),
            "contract": ("IFS contract jobs", lambda j: j.get("contract_type") == "Contract", "ifs-jobs/contract/"),
@@ -228,7 +229,7 @@ def page(path, title, desc, body, active="", ld=(), crumbs=(), priority="0.6", l
               f'<button class="btn" type="submit">Subscribe</button></form><p class="msg" hidden style="max-width:480px"></p></div>'
               f'<ul class="linklist"><li><a href="{root}about/">About and method</a></li><li><a href="{root}guides/">IFS career guides</a></li><li><a href="{root}ifs-partners/">IFS partners by country</a></li><li><a href="{root}ifs-hiring-report/">IFS hiring report</a></li><li><a href="{root}ifs-hiring-index/">IFS Hiring Index</a></li>'
               f'<li><a href="{root}ifs-jobs/remote/">Remote IFS jobs</a></li><li><a href="{root}ifs-jobs/contract/">IFS contract jobs</a></li>'
-              f'<li><a href="{root}ifs-jobs/ifs-cloud/">IFS Cloud jobs</a></li><li><a href="{root}hire/">Hire IFS talent</a></li><li><a href="{root}marketing-for-ifs-partners/">Marketing for IFS partners</a></li></ul>'
+              f'<li><a href="{root}ifs-jobs/ifs-cloud/">IFS Cloud jobs</a></li><li><a href="{root}hire/">Hire IFS talent</a></li><li><a href="{root}marketing-for-ifs-partners/">Marketing for IFS partners</a></li>{f'<li><a href="{e(CFG["linkedin"])}" rel="noopener" target="_blank">findifsjobs on LinkedIn</a></li>' if CFG.get("linkedin") else ""}</ul>'
               f'<p><b style="color:var(--ink);font-weight:500">findifsjobs.com</b> is an independent job board. It is not affiliated with, endorsed by or sponsored by IFS. '
               f'IFS and IFS Cloud are trademarks of their owner. Company names and logos belong to their owners and are shown to identify them.</p>'
               f'<p>Jobs refresh daily from public careers pages. Last updated {TODAY.strftime("%-d %B %Y")}.</p></div></footer>')
@@ -283,7 +284,8 @@ if (HERE / "logos").exists():
 top3c = ", ".join(f"{c} ({n})" for c, n in by_country[:3])
 top3a = ", ".join(f"{a} ({n})" for a, n in by_area[:3])
 GUIDE_LINKS = [("guides/how-to-become-an-ifs-consultant/", "How to become an IFS consultant"), ("guides/ifs-certification/", "IFS certification explained"),
-               ("guides/ifs-skills-in-demand/", "IFS skills in demand")]
+               ("guides/ifs-skills-in-demand/", "IFS skills in demand"), ("guides/what-is-an-ifs-consultant/", "What is an IFS consultant?"),
+               ("guides/what-is-an-ifs-partner/", "IFS partner types and levels")]
 home_faq, home_ld = faq([
     ("How many IFS jobs are open right now?", f"findifsjobs lists {N} open IFS jobs from {employers_n} employers as of {TODAY.strftime('%-d %B %Y')}. The list refreshes every day from public careers pages."),
     ("Which countries have the most IFS jobs?", f"The countries with the most open IFS roles are {top3c}."),
@@ -301,13 +303,13 @@ home = (hero("IFS consultant, developer and architect jobs", "Find your next <em
         + f'<section class="stack"><h2>IFS jobs by country</h2>{country_links("")}</section>'
         + f'<section class="stack"><h2>IFS jobs by module</h2>{area_links("")}</section>'
         + f'<section class="stack"><h2>IFS career guides</h2>{links([(t, p, None) for p, t in GUIDE_LINKS], "")}</section>{mstrip("")}{home_faq}</div>')
-page("", f"IFS Consultant Jobs: {N} open IFS Cloud, ERP, EAM and FSM jobs | findifsjobs",
+page("", f"IFS Jobs: {N} open IFS consultant, Cloud, ERP and EAM roles | findifsjobs",
      f"{N} open IFS jobs from {employers_n} employers in {len(by_country)} countries. IFS Cloud consultants, developers, architects and support roles, updated daily.",
      home, active="", priority="1.0",
      ld=[home_ld, {"@context": "https://schema.org", "@type": "WebSite", "name": "findifsjobs", "url": SITE + "/",
                    "potentialAction": {"@type": "SearchAction", "target": SITE + "/?q={search_term_string}", "query-input": "required name=search_term_string"}},
-         {"@context": "https://schema.org", "@type": "Organization", "name": "findifsjobs", "url": SITE + "/",
-          "description": "Independent job board and directory for the IFS ERP ecosystem."}])
+         {"@context": "https://schema.org", "@type": "Organization", "name": "findifsjobs", "url": SITE + "/", "logo": SITE + "/apple-touch-icon.png",
+          "description": "Independent job board and directory for the IFS ERP ecosystem.", **({"sameAs": [CFG["linkedin"]]} if CFG.get("linkedin") else {})}])
 
 # ---- job pages
 EMP = {"Contract": "CONTRACTOR", "Permanent": "FULL_TIME", "Fixed term": "TEMPORARY"}
@@ -405,12 +407,13 @@ for c, n in countries.items():
     emps = Counter(j["company"] for j in items).most_common(3)
     ars = Counter(j["area"] for j in items if known(j.get("area"))).most_common(3)
     emp_txt, ar_txt = ", ".join(x for x, _ in emps), ", ".join(x for x, _ in ars)
-    landing(cpath(c), f"IFS jobs in {c}", f"{plural(n, 'open IFS role')} in {e(c)} from {plural(len({j['company'] for j in items}), 'employer')}, updated daily.", items,
-            f"IFS jobs in {c}: {plural(n, 'open role')} ({MONTH}) | findifsjobs",
-            f"{plural(n, 'open IFS job')} in {c}. Employers include {emp_txt}. IFS Cloud consultant, developer, architect and support roles, refreshed daily.",
-            [(f"How many IFS jobs are open in {c}?", f"{plural(n, 'IFS role')} in {c} as of {TODAY.strftime('%-d %B %Y')}."),
-             (f"Who is hiring for IFS in {c}?", f"The employers with the most open IFS roles in {c} are {emp_txt}."),
-             (f"Which IFS skills are wanted in {c}?", f"The most common areas are {ar_txt}." if ar_txt else "Roles span several IFS modules.")], c)
+    d = CNAME.get(c, c)
+    landing(cpath(c), f"IFS jobs in {d}", f"{plural(n, 'open IFS role')} in {e(d)} from {plural(len({j['company'] for j in items}), 'employer')}, updated daily.", items,
+            f"IFS jobs in {d}: {plural(n, 'open IFS ERP role')} ({MONTH}) | findifsjobs",
+            f"{plural(n, 'open IFS ERP job')} in {d}. Employers include {emp_txt}. IFS Cloud consultant, developer, architect and support roles, refreshed daily.",
+            [(f"How many IFS jobs are open in {d}?", f"{plural(n, 'IFS role')} in {d} as of {TODAY.strftime('%-d %B %Y')}."),
+             (f"Who is hiring for IFS in {d}?", f"The employers with the most open IFS roles in {d} are {emp_txt}."),
+             (f"Which IFS skills are wanted in {d}?", f"The most common areas are {ar_txt}." if ar_txt else "Roles span several IFS modules.")], c)
 for a, n in areas.items():
     items = [j for j in jobs if j.get("area") == a]
     cs = ", ".join(x for x, _ in Counter(j["country"] for j in items if known(j.get("country"))).most_common(3))
@@ -455,9 +458,9 @@ toolbar = ('<div class="toolbar"><input type="search" class="plain" id="p-q" pla
            f'<select id="p-region" aria-label="Region"><option value="">All regions</option>{"".join(f"""<option value="{k}">{v[0]}</option>""" for k, v in REG.items())}</select>'
            '<select id="p-kind" aria-label="Type"><option value="">All types</option><option value="S">IFS specialists</option><option value="B">ERP boutiques</option><option value="G">Global firms</option></select>'
            '<select id="p-sort" aria-label="Sort"><option value="score">Emerging first</option><option value="az">A to Z</option><option value="tier">Highest tier first</option></select></div>')
-page("partners/", f"IFS partner directory: {len(partners)} implementation partners | findifsjobs",
-     f"{len(partners)} verified IFS partners across eight regions, with tier, size, focus and careers links. Sorted to surface emerging IFS specialists first.",
-     hero("Partner directory", f"{len(partners)} IFS partners, emerging firms first", "Every firm is confirmed as an IFS partner by the IFS directory, an IFS announcement or an IFS event listing.")
+page("partners/", f"IFS partner companies: {len(partners)} IFS implementation partners ({TODAY.year}) | findifsjobs",
+     f"Directory of {len(partners)} verified IFS partner companies across eight regions: channel, service and implementation partners with tier, size, focus and careers links.",
+     hero("Partner directory", f"{len(partners)} IFS partner companies, emerging firms first", "Every firm is confirmed as an IFS partner by the IFS directory, an IFS announcement or an IFS event listing.")
      + f'<div class="wrap">{toolbar}<p class="muted small" id="p-count">{len(partners)} of {len(partners)} partners</p><ul class="grid" id="p-list">{cells}</ul><section class="stack"><h2>IFS partners by country</h2>{links([(c, f"ifs-partners/{slug(c)}/", len(v)) for c, v in PC_PAGES.items()], "../")}</section>{mstrip("../")}</div>',
      active="partners/", crumbs=[("Partner directory", None)], priority="0.8")
 
@@ -517,8 +520,9 @@ for r, (short, long, rs) in REG.items():
                      ("Is this an official IFS ranking?", "No. It is an independent editorial ranking by findifsjobs, built from public facts.")])
     il = {"@context": "https://schema.org", "@type": "ItemList", "name": f"Top 10 IFS partners in {long}", "itemListElement": [
         {"@type": "ListItem", "position": i + 1, "name": p["n"], "url": f"{SITE}/{p['path']}"} for i, p in enumerate(t)]}
-    page(f"top-ifs-partners/{rs}/", f"Top 10 IFS partners in {long} (2026) | findifsjobs",
-         f"The top 10 IFS implementation partners in {long}: {names} and more. Ranked on focus, growth, awards and tier, with the method shown.",
+    where = "North America: USA and Canada" if r == "NA" else long
+    page(f"top-ifs-partners/{rs}/", f"Top 10 IFS partners in {where} (2026) | findifsjobs",
+         f"The top 10 IFS implementation partners in {where}: {names} and more. Ranked on focus, growth, awards and tier, with the method shown.",
          hero("The 2026 ranking", f'Top 10 <em>IFS partners</em> in {e(long)}', "Ranked for people choosing where to work or who to hire. Specialists and fast-growing firms come first.", h1cls="mega")
          + f'<div class="wrap">{pills(r, root)}<ol class="podium">{"".join(pod(p, i, root) for i, p in enumerate(t[:3]))}</ol>'
            f'<ol class="rrows" start="4">{"".join(rrow(p, i + 3, root) for i, p in enumerate(t[3:]))}</ol>{METHOD}{block}</div>',
@@ -726,7 +730,7 @@ for c, lst in PC_PAGES.items():
     il = {"@context": "https://schema.org", "@type": "ItemList", "name": f"IFS partners in {the}", "itemListElement": [
         {"@type": "ListItem", "position": i + 1, "name": p["n"], "url": f"{SITE}/{p['path']}"} for i, p in enumerate(lst)]}
     others = links([(k, f"ifs-partners/{slug(k)}/", len(v)) for k, v in PC_PAGES.items() if k != c], "../../")
-    page(f"ifs-partners/{slug(c)}/", f"IFS partners in {the}: {len(lst)} IFS implementation partners ({TODAY.year}) | findifsjobs",
+    page(f"ifs-partners/{slug(c)}/", f"IFS partners in {the}: {len(lst)} {'US ' if c == 'USA' else ''}IFS implementation partners ({TODAY.year}) | findifsjobs",
          f"{len(lst)} IFS implementation partners headquartered in {the}: {names}{' and more' if len(lst) > 5 else ''}. Focus, size, tier and open IFS jobs for each.",
          hero("IFS implementation partners", f'IFS partners in <em>{e(the)}</em>', f"{len(lst)} verified IFS partners with their headquarters in {e(the)}. Firms based elsewhere that also deliver here are in the regional Top 10.")
          + f'<div class="wrap"><ul class="grid">{"".join(pcell(p, "../../") for p in lst)}</ul>'
@@ -816,6 +820,11 @@ junior = [j for j in jobs if j.get("seniority") == "Junior" or re.search(r"junio
 contract_n = sum(j.get("contract_type") == "Contract" for j in jobs)
 perm_n = sum(j.get("contract_type") == "Permanent" for j in jobs)
 tiers = Counter(p.get("tier") for p in partners if p.get("tier"))
+def live(pred, k=6):
+    js = sorted((j for j in jobs if pred(j)), key=lambda j: j["when"], reverse=True)[:k]
+    return ("<ul>" + "".join(f'<li><a href="../../{j["path"]}">{e(j["title"])}</a>, {e(j["company"])}{", " + e(j["loc"]) if j["loc"] else ""}</li>' for j in js) + "</ul>") if js else "<p>No matching roles today. New jobs are added every morning.</p>"
+
+
 IFS_IND = "aerospace and defence, energy, utilities and resources, construction and engineering, manufacturing, service industries and telecommunications"
 GUIDES += [
     qa("what-does-an-ifs-functional-consultant-do", "What does an IFS functional consultant do?", "The day-to-day work of an IFS functional consultant, the skills needed and how many roles are open.",
@@ -823,7 +832,11 @@ GUIDES += [
        f'<h2>What the work looks like</h2><ul><li><b>Discover.</b> Workshops to map current processes and agree how they will run in IFS.</li><li><b>Configure.</b> Set up basic data, company structures, flows and permissions in the module.</li>'
        f'<li><b>Test and migrate.</b> Write test scripts, support user acceptance testing and check migrated data.</li><li><b>Train and go live.</b> Train key users, then stay close through cutover and the first weeks of live running.</li></ul>'
        f'<h2>Skills employers ask for</h2><p>Depth in one business area matters most. After that: experience of at least one full implementation, IFS Cloud knowledge, and the ability to run a workshop with senior people. Technical consultants handle code and integrations, so functional consultants need to brief them well, not replace them.</p>'
-       f'<h2>Demand right now</h2><p>The board lists {ROLE_N.get("functional", 0)} {jl("functional", "IFS functional consultant jobs")} out of {N} open roles. The busiest areas are {top3a}.</p>',
+       f'<h2>Functional consultants by module</h2><ul><li><b>Finance:</b> general ledger, accounts payable and receivable, fixed assets and consolidation.</li><li><b>Supply chain:</b> purchasing, inventory, warehousing and distribution.</li>'
+       f'<li><b>Manufacturing:</b> shop floor, MRP and planning, often in engineer to order or project based manufacturers.</li><li><b>EAM and maintenance:</b> asset registers, work orders and preventive maintenance.</li>'
+       f'<li><b>Field service (FSM):</b> service contracts, scheduling and mobile work for field engineers.</li><li><b>Projects and HCM:</b> project costing and billing, and people, payroll and time.</li></ul>'
+       f'<h2>Demand right now</h2><p>The board lists {ROLE_N.get("functional", 0)} {jl("functional", "IFS functional consultant jobs")} out of {N} open roles. The busiest areas are {top3a}.</p>'
+       f'<h2>Latest IFS functional consultant jobs</h2>{live(ROLES["functional"][1] if "functional" in ROLES else (lambda j: False))}',
        [("Is an IFS functional consultant a technical role?", "No. It is a business-process and configuration role. Coding, integrations and data migration tooling sit with technical consultants."),
         ("What background do IFS functional consultants have?", "Most come from the business area they now consult in: accountants into finance, planners into supply chain or manufacturing, maintenance engineers into EAM.")]),
     qa("what-does-an-ifs-technical-consultant-do", "What does an IFS technical consultant do?", "What IFS technical consultants and developers build, the tools they use and current demand.",
@@ -831,7 +844,8 @@ GUIDES += [
        f'<h2>What they build</h2><ul><li><b>Customisations and extensions</b> to the standard application.</li><li><b>Integrations</b> with other systems through REST and OData APIs and IFS Connect.</li>'
        f'<li><b>Data migration</b> from legacy systems, including cleansing and load tooling.</li><li><b>Reports, lobbies and workflows</b> that users work with every day.</li></ul>'
        f'<h2>What changed with IFS Cloud</h2><p>IFS Cloud is updated on a regular release cycle, so heavy modification of core code has become a liability. Technical work has moved toward configuration, extensions and API integrations that survive updates.</p>'
-       f'<h2>Demand right now</h2><p>There are {ROLE_N.get("technical", 0)} {jl("technical", "IFS technical consultant and developer jobs")} on the board, out of {N} open roles.</p>',
+       f'<h2>Demand right now</h2><p>There are {ROLE_N.get("technical", 0)} {jl("technical", "IFS technical consultant and developer jobs")} on the board, out of {N} open roles.</p>'
+       f'<h2>Latest IFS technical and developer jobs</h2>{live(lambda j: j.get("area") == "Technical / Development")}',
        [("Which programming language do IFS developers use?", "PL/SQL is the core language, on an Oracle database. Integration and front-end work add API and web skills."),
         ("Can a technical consultant move into solution architecture?", f"Yes, it is a common path. There are {ROLE_N.get('architect', 0)} IFS solution architect roles open on the board today.")]),
     qa("ifs-cloud-vs-ifs-applications-10", "IFS Cloud vs IFS Applications 10: what changes for consultants", "How IFS Cloud differs from Apps 10 for people who implement and support it, and what to learn.",
@@ -910,14 +924,45 @@ GUIDES += [
        f'<h2>What it means for careers</h2><p>Industry knowledge is a real asset in IFS. A consultant who understands defence maintenance or utility field work is harder to replace than a generalist. Partners specialise the same way; see <a href="../../ifs-partners/">IFS partners by industry and country</a>.</p>',
        [("Is IFS used in retail or banking?", "Rarely. IFS concentrates on asset-heavy, project-based and service-heavy industries."),
         ("Which IFS industry has the most partners?", "By the focus areas listed in the findifsjobs directory, energy, construction and manufacturing have the most partners.")]),
-    qa("what-is-an-ifs-partner", "What is an IFS partner?", "What IFS partners do, the tiers you will see and how to choose one to work for or hire.",
-       f"An IFS partner is an independent company authorised by IFS to sell, implement, extend or support IFS software. findifsjobs lists {len(partners)} verified partners, from IFS-only specialists to global consulting firms.",
-       f'<h2>Types of partner</h2><ul><li><b>IFS specialists</b> that work only on IFS ({sum(p["kind"] == "S" for p in partners)} in the directory).</li><li><b>ERP boutiques</b> that cover IFS alongside other systems ({sum(p["kind"] == "B" for p in partners)}).</li>'
+    qa("what-is-an-ifs-partner", "What is an IFS partner? Types and levels explained", "IFS partner types (channel, service, system integrator, ISV), partner levels (Platinum, Gold, Silver, Authorized) and how to choose one.",
+       f"An IFS partner is an independent company that IFS authorises to sell, implement, extend or support its software. IFS groups partners by type (channel resellers, global and regional system integrators, service partners and software vendors) and by level (Platinum, Gold, Silver and Authorized). findifsjobs lists {len(partners)} verified IFS partner companies.",
+       f'<h2>IFS partner types</h2><ul><li><b>Channel partner (value added reseller).</b> Sells IFS licences to new customers and usually implements and supports them too. This is what a firm means when it calls itself an IFS channel partner.</li>'
+       f'<li><b>Global system integrator.</b> Works across two or more regions and mostly co-sells with IFS on large strategic accounts. These are the big consulting firms with an IFS practice.</li>'
+       f'<li><b>Regional system integrator.</b> Covers several IFS market units inside one region and co-sells into large enterprise accounts.</li>'
+       f'<li><b>Service partner.</b> Focuses only on delivery for existing IFS customers: implementations, upgrades, support and managed services. Most firms that describe themselves as an IFS implementation partner or IFS support partner sit here or in the channel track.</li>'
+       f'<li><b>ISV partner.</b> A software vendor whose product extends IFS, for example mobile apps, integrations, AI, IoT or analytics.</li></ul>'
+       f'<h2>IFS partner levels: Platinum, Gold, Silver and Authorized</h2><p>The current IFS partner program sets four relationship levels. <b>Platinum</b> is the top level for strategic partners with broad reach. <b>Gold</b> is for established partners with a track record and a growing IFS practice. <b>Silver</b> is the entry level for new partners. <b>Authorized</b> is a referral only relationship.</p>'
+       f'<p>Older labels are still common. Partner websites and listings often use names such as Elite, Premier and Specialized, or "Gold Channel Partner". In the findifsjobs directory, {", ".join(f"{n} are listed as {t}" for t, n in tiers.most_common())}; the rest have no level published.</p>'
+       f'<h2>IFS partners by speciality</h2><p>Partners also specialise by industry and product. If you are looking for an IFS manufacturing partner, a field service partner or an asset management (EAM) partner, start here:</p>{ind_links("../../")}'
+       f'<p>Some partners also host IFS Cloud or run it as a managed service for customers. Ask about hosting and support terms early if you are choosing one to hire.</p>'
+       f'<h2>IFS partners by region</h2><ul><li><a href="../../top-ifs-partners/usa-canada/">Top 10 IFS partners in North America (USA and Canada)</a></li><li><a href="../../top-ifs-partners/uk-ireland/">Top 10 IFS partners in the UK and Ireland</a></li>'
+       f'<li><a href="../../top-ifs-partners/">All regional Top 10 lists</a></li><li><a href="../../ifs-partners/">IFS partners by country</a></li></ul>'
+       f'<h2>Who is in the directory</h2><ul><li><b>IFS specialists</b> that work only on IFS ({sum(p["kind"] == "S" for p in partners)}).</li><li><b>ERP boutiques</b> that cover IFS alongside other systems ({sum(p["kind"] == "B" for p in partners)}).</li>'
        f'<li><b>Global firms</b> with an IFS practice ({sum(p["kind"] == "G" for p in partners)}).</li></ul>'
-       f'<h2>Tiers</h2><p>IFS groups partners into tiers. In the directory, {", ".join(f"{n} are {t}" for t, n in tiers.most_common())}; the rest have no tier published.</p>'
-       f'<h2>Choosing one</h2><p>To work for: look at how many live projects they run in your module and whether they train and certify people. To hire: ask for references in your industry and on your IFS version. Start with the <a href="../../top-ifs-partners/">regional Top 10</a> or the <a href="../../partners/">full directory</a>.</p>',
-       [("How do I check a company is really an IFS partner?", "Look for it in the IFS partner directory or an IFS announcement. Every profile on findifsjobs links to that source."),
-        ("Are bigger IFS partners better?", "Not necessarily. Specialists often have deeper IFS teams in a given module or industry than a global firm's local practice.")]),
+       f'<h2>Choosing one</h2><p>To work for: look at how many live projects they run in your module and whether they train and certify people. To hire: ask for references in your industry and on your IFS version. Start with the <a href="../../top-ifs-partners/">regional Top 10</a> or the <a href="../../partners/">full list of IFS partner companies</a>.</p>',
+       [("What is an IFS channel partner?", "A value added reseller that sells IFS licences to new customers, and usually implements and supports them as well."),
+        ("What is the difference between an IFS channel partner and a service partner?", "A channel partner sells IFS licences and delivers projects. A service partner only delivers services, such as implementations, upgrades and support, for companies that already run IFS."),
+        ("What is the highest IFS partner level?", "Platinum, under the current IFS partner program. Older material and some partner websites call Gold or Elite the top level, because the program and its labels have changed over time."),
+        ("What is an IFS implementation partner?", "Any IFS partner that runs IFS projects for customers. Both channel partners and service partners implement IFS."),
+        ("How do I check a company is really an IFS partner?", "Look for it in the IFS partner directory or an IFS announcement. Every profile on findifsjobs links to that source."),
+        ("Are bigger IFS partners better?", "Not necessarily. Specialists often have deeper IFS teams in a given module or industry than a global firm's local practice.")],
+       [("IFS: Become a partner (partner types and levels)", "https://www.ifs.com/en/partners/become-a-partner")]),
+    qa("what-is-an-ifs-consultant", "What is an IFS consultant?", "What IFS consultants do, the main types (functional, technical, architect, project manager), where they work and how many IFS consultant jobs are open.",
+       f"An IFS consultant helps companies implement, improve and support IFS, the ERP, asset management and field service software. Most are either functional consultants, who set up business processes in a module such as finance or maintenance, or technical consultants, who build integrations, extensions and data migrations. findifsjobs lists {N} open IFS roles today.",
+       f'<h2>The main types of IFS consultant</h2><ul><li><b>Functional consultant.</b> Runs workshops, configures a module and trains users. See <a href="../what-does-an-ifs-functional-consultant-do/">what an IFS functional consultant does</a>.</li>'
+       f'<li><b>Technical consultant or developer.</b> Builds integrations, extensions, reports and data migrations. See <a href="../what-does-an-ifs-technical-consultant-do/">what an IFS technical consultant does</a>.</li>'
+       f'<li><b>Solution architect.</b> Designs the overall solution across modules and integrations ({ROLE_N.get("architect", 0)} open roles).</li>'
+       f'<li><b>Project manager.</b> Runs the implementation plan, budget and people ({areas.get("Project Management", 0)} open roles).</li>'
+       f'<li><b>Support consultant.</b> Looks after live IFS systems, fixes issues and handles updates ({areas.get("Support / Admin", 0)} open roles).</li></ul>'
+       f'<h2>Where IFS consultants work</h2><ul><li><b>IFS partners</b>, the biggest employer group. Browse the <a href="../../partners/">IFS partner companies</a>.</li>'
+       f'<li><b>IFS itself</b>, mostly in its consulting and customer success teams.</li><li><b>Companies that run IFS</b> and keep an in house team.</li>'
+       f'<li><b>Freelance and contract</b>, usually through specialist <a href="../../ifs-recruiters/">IFS recruiters</a> ({contract_n} contract roles open now).</li></ul>'
+       f'<h2>Modules IFS consultants specialise in</h2><ul>{"".join(f"""<li><a href="../../{apath(a)}">{e(a)}</a>: {n} open roles</li>""" for a, n in sorted(areas.items(), key=lambda x: -x[1]) if a not in {"Multi-module", "Sales / Presales", *AREA_ROLE.values()})}</ul>'
+       f'<h2>Latest IFS consultant jobs</h2>{live(lambda j: re.search(r"consultant", j["title"], re.I))}<p><a href="../../">See all {N} open IFS jobs</a>.</p>',
+       [("What does an IFS ERP consultant do?", "The same as an IFS consultant: they implement and support IFS for a company, either on the business process side (functional) or the build side (technical)."),
+        ("How do I become an IFS consultant?", "Build on a business area you already know, get hands on with IFS Cloud through an employer that runs or implements it, and add IFS certification. The full route is in the guide on how to become an IFS consultant."),
+        ("Do IFS consultants need to code?", "Functional consultants do not. Technical consultants work with PL/SQL, APIs and the IFS development tools."),
+        ("How many IFS consultant jobs are open?", f"{N} IFS roles are open on findifsjobs as of {TODAY.strftime('%-d %B %Y')}, refreshed every day.")]),
     qa("how-to-hire-an-ifs-consultant", "How to hire an IFS consultant", "A practical guide for companies hiring IFS consultants: where to find them, what to specify and how to assess them.",
        "Specify the module, the IFS version and the project phase before you search. Then use three channels at once: an IFS partner for a team, a specialist IFS recruiter for individual contractors or permanent hires, and direct reach to freelancers. Generic job boards rarely reach IFS people.",
        f'<h2>1. Write the brief</h2><ul><li>Module and industry (for example, IFS Cloud Finance in a project-based manufacturer)</li><li>Version: IFS Cloud, Apps 10 or earlier</li><li>Phase: design, build, migration, testing, cutover or support</li><li>Contract or permanent, location and start date</li></ul>'
