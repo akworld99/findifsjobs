@@ -1,7 +1,7 @@
 {
  "month": "2026-10",
- "as_of": "2026-10-26",
- "roles": 159,
+ "as_of": "2026-10-27",
+ "roles": 160,
  "employers": 39,
  "countries": 22,
  "cloud": 59,
@@ -24,15 +24,15 @@
    20
   ],
   [
+   "Project Management",
+   11
+  ],
+  [
    "EAM / Maintenance",
    10
   ],
   [
    "Manufacturing",
-   10
-  ],
-  [
-   "Project Management",
    10
   ],
   [
@@ -93,7 +93,7 @@
  "by_employer": [
   [
    "IFS",
-   45
+   46
   ],
   [
    "Arcwide",
@@ -139,7 +139,7 @@
   ],
   [
    "IFS vendor",
-   45
+   46
   ],
   [
    "Recruiter",
@@ -169,7 +169,7 @@
   ],
   [
    "Project manager",
-   10
+   11
   ],
   [
    "Support",
