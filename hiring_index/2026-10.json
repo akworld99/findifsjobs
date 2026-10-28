@@ -1,7 +1,7 @@
 {
  "month": "2026-10",
- "as_of": "2026-10-27",
- "roles": 160,
+ "as_of": "2026-10-28",
+ "roles": 163,
  "employers": 39,
  "countries": 22,
  "cloud": 59,
@@ -9,7 +9,7 @@
  "by_area": [
   [
    "Architecture",
-   30
+   31
   ],
   [
    "Technical / Development",
@@ -25,7 +25,7 @@
   ],
   [
    "Project Management",
-   11
+   13
   ],
   [
    "EAM / Maintenance",
@@ -51,7 +51,7 @@
  "by_country": [
   [
    "United States",
-   21
+   24
   ],
   [
    "Sri Lanka",
@@ -93,7 +93,7 @@
  "by_employer": [
   [
    "IFS",
-   46
+   49
   ],
   [
    "Arcwide",
@@ -139,7 +139,7 @@
   ],
   [
    "IFS vendor",
-   46
+   49
   ],
   [
    "Recruiter",
@@ -165,11 +165,11 @@
   ],
   [
    "Solution architect",
-   30
+   31
   ],
   [
    "Project manager",
-   11
+   13
   ],
   [
    "Support",
