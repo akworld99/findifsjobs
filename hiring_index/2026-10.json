@@ -1,11 +1,11 @@
 {
  "month": "2026-10",
- "as_of": "2026-10-28",
- "roles": 163,
+ "as_of": "2026-10-29",
+ "roles": 164,
  "employers": 39,
  "countries": 22,
  "cloud": 59,
- "remote": 54,
+ "remote": 55,
  "by_area": [
   [
    "Architecture",
@@ -17,7 +17,7 @@
   ],
   [
    "Multi-module",
-   22
+   23
   ],
   [
    "Finance",
@@ -66,15 +66,15 @@
    13
   ],
   [
+   "Australia",
+   10
+  ],
+  [
    "Japan",
    10
   ],
   [
    "Netherlands",
-   9
-  ],
-  [
-   "Australia",
    9
   ],
   [
@@ -93,7 +93,7 @@
  "by_employer": [
   [
    "IFS",
-   49
+   50
   ],
   [
    "Arcwide",
@@ -139,7 +139,7 @@
   ],
   [
    "IFS vendor",
-   49
+   50
   ],
   [
    "Recruiter",
@@ -157,7 +157,7 @@
  "role_mix": [
   [
    "Functional consultant",
-   70
+   71
   ],
   [
    "Technical and developer",
