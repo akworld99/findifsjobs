@@ -1,4 +1,4 @@
-Run 2026-10-30 13:38 UTC, 168 jobs on the board
+Run 2026-10-30 13:53 UTC, 168 jobs on the board
 
 IFS                   smartrecruiters   42 jobs
 Arcwide               teamtailor        21 jobs
