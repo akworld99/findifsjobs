@@ -1,7 +1,7 @@
 {
  "month": "2026-10",
  "as_of": "2026-10-30",
- "roles": 167,
+ "roles": 168,
  "employers": 39,
  "countries": 22,
  "cloud": 59,
@@ -24,12 +24,12 @@
    20
   ],
   [
-   "Project Management",
+   "Supply Chain",
    13
   ],
   [
-   "Supply Chain",
-   12
+   "Project Management",
+   13
   ],
   [
    "EAM / Maintenance",
@@ -78,12 +78,12 @@
    9
   ],
   [
-   "Switzerland",
+   "India",
    5
   ],
   [
-   "India",
-   4
+   "Switzerland",
+   5
   ],
   [
    "Austria",
@@ -93,7 +93,7 @@
  "by_employer": [
   [
    "IFS",
-   53
+   54
   ],
   [
    "Arcwide",
@@ -139,7 +139,7 @@
   ],
   [
    "IFS vendor",
-   53
+   54
   ],
   [
    "Recruiter",
