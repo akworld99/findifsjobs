@@ -1,11 +1,11 @@
 {
  "month": "2026-10",
- "as_of": "2026-10-29",
- "roles": 164,
+ "as_of": "2026-10-30",
+ "roles": 167,
  "employers": 39,
  "countries": 22,
  "cloud": 59,
- "remote": 55,
+ "remote": 58,
  "by_area": [
   [
    "Architecture",
@@ -28,16 +28,16 @@
    13
   ],
   [
+   "Supply Chain",
+   12
+  ],
+  [
    "EAM / Maintenance",
    10
   ],
   [
    "Manufacturing",
    10
-  ],
-  [
-   "Supply Chain",
-   9
   ],
   [
    "Support / Admin",
@@ -58,12 +58,12 @@
    20
   ],
   [
-   "Sweden",
+   "United Kingdom",
    16
   ],
   [
-   "United Kingdom",
-   13
+   "Sweden",
+   16
   ],
   [
    "Australia",
@@ -93,7 +93,7 @@
  "by_employer": [
   [
    "IFS",
-   50
+   53
   ],
   [
    "Arcwide",
@@ -139,7 +139,7 @@
   ],
   [
    "IFS vendor",
-   50
+   53
   ],
   [
    "Recruiter",

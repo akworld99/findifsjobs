@@ -1,6 +1,6 @@
-Run 2026-10-29 02:18 UTC, 164 jobs on the board
+Run 2026-10-30 02:17 UTC, 167 jobs on the board
 
-IFS                   smartrecruiters   39 jobs
+IFS                   smartrecruiters   41 jobs
 Arcwide               teamtailor        22 jobs
 Novacura              teamtailor         6 jobs
 Addovation            teamtailor         0 jobs
@@ -17,4 +17,5 @@ Xitricon              html               1 jobs
 Solika Consulting     html               1 jobs
 BW Energy             workable           1 jobs
 GoLive Recruitment    wprss              7 jobs
-Cubiq Recruitment     html               8 jobs
+    Cubiq Recruitment: page 208870 chars, 82 links, 0 job-like; sample []
+Cubiq Recruitment     html               0 jobs
