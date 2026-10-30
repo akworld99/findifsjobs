@@ -576,7 +576,7 @@ page("freelancers/", "IFS freelancers: get featured free | findifsjobs",
      "IFS contractors and freelancers can add a free profile to findifsjobs so IFS partners and customers can find them. No fee, no commission.",
      hero("For IFS freelancers", "Get featured on findifsjobs, free", "If you contract in IFS, add your profile. Partners and IFS customers looking for project cover will see your modules, availability and how to reach you. No fee, no commission.")
      + f'<div class="wrap">{three([("A profile on the board", "Your headline, modules, IFS versions, location and availability."), ("Direct contact", "Companies reach you through your LinkedIn profile. We do not sit in the middle."), ("Free, and yours to remove", "Ask at any time and your profile comes down.")])}'
-     f'{fl_form}<h2 style="font-size:1.1rem">Featured freelancers</h2><ul class="grid">{fl_cells}</ul></div>', active="freelancers/", crumbs=[("Freelancers", None)], priority="0.7")
+     + (f'<h2 style="font-size:1.1rem">Featured freelancers</h2><ul class="grid">{fl_cells}</ul><h2 style="font-size:1.1rem">Add your profile</h2>{fl_form}</div>' if freelancers else f'{fl_form}<h2 style="font-size:1.1rem">Featured freelancers</h2><ul class="grid">{fl_cells}</ul></div>'), active="freelancers/", crumbs=[("Freelancers", None)], priority="0.7")
 
 # ---- news
 def nart(n, big=False):
