@@ -555,12 +555,37 @@ page("ifs-recruiters/", "IFS recruiters: specialist IFS recruitment agencies | f
      active="ifs-recruiters/", ld=[fl], crumbs=[("Recruiters", None)], priority="0.8")
 
 # ---- freelancers
-fl_cells = "".join(
-    f'<li class="cell"><div class="head">{logo(f["name"], "../")}<div class="body"><h3>{e(f["name"])}</h3><p class="meta">{e(f.get("location") or "")}</p></div></div>'
-    f'<p class="sum">{e(f["headline"])}</p>{f"""<p class="kv"><b>Modules:</b> {e(f["modules"])}</p>""" if f.get("modules") else ""}'
-    f'<div class="tags">{f"""<span class="tag v">{e(f["versions"])}</span>""" if f.get("versions") else ""}{f"""<span class="tag">{e(f["availability"])}</span>""" if f.get("availability") else ""}</div>'
-    f'<div class="foot">{ext(f.get("linkedin"), "LinkedIn profile")}</div></li>' for f in freelancers) or \
-    '<li class="empty" style="grid-column:1/-1;border:1px dashed var(--line);border-radius:var(--r)">No freelancers featured yet. Be the first.</li>'
+def fl_years(f):
+    m = re.search(r"(\d{1,2})\+?\s*(?:years|yrs)", f.get("headline", ""), re.I)
+    return m.group(1) if m else None
+
+
+def fl_card(f):
+    yrs = fl_years(f)
+    role = re.sub(r"[\s,]*(?:with\s+)?\d{1,2}\+?\s*(?:years|yrs)\b.*$", "", f["headline"], flags=re.I).strip(" ,.") if yrs else f["headline"]
+    mods = [m.strip() for m in re.split(r"[,/;]", f.get("modules") or "") if m.strip()]
+    ini = "".join(w[0] for w in f["name"].split()[:2]).upper()
+    stats = ([(yrs, "years in IFS")] if yrs else []) + ([(f["versions"], "IFS version")] if f.get("versions") else [])
+    avail = f.get("availability") or ""
+    live = avail.lower().startswith("available")
+    pin = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg>'
+    return (f'<li><article class="fcard"><div class="fside">{f"""<span class="fghost" aria-hidden="true">{yrs}</span>""" if yrs else ""}'
+            f'<span class="favatar" aria-hidden="true">{e(ini)}</span><h3>{e(f["name"])}</h3>'
+            f'{f"""<p class="floc">{pin}{e(f["location"])}</p>""" if f.get("location") else ""}'
+            f'{f"""<span class="favail{" on" if live else ""}"><i></i>{e(avail)}</span>""" if avail else ""}</div>'
+            f'<div class="fmain"><p class="fk">IFS freelancer</p><p class="frole">{e(role)}</p>'
+            f'{"<dl class=fstats>" + "".join(f"<div><dt>{e(l)}</dt><dd>{e(v)}</dd></div>" for v, l in stats) + "</dl>" if stats else ""}'
+            f'{"<ul class=fchips>" + "".join(f"<li>{e(m)}</li>" for m in mods) + "</ul>" if mods else ""}'
+            f'<div class="fact">{f"""<a class="btn fbtn" href="{e(f["linkedin"])}" target="_blank" rel="noopener nofollow">Contact on LinkedIn <span aria-hidden="true">&rarr;</span></a>""" if f.get("linkedin") else ""}'
+            f'<a class="pbtn" href="../hire/">Need a full team?</a></div></div></article></li>')
+
+
+fl_cells = "".join(fl_card(f) for f in freelancers)
+fl_ld = {"@context": "https://schema.org", "@type": "ItemList", "name": "IFS freelancers on findifsjobs", "itemListElement": [
+    {"@type": "ListItem", "position": i + 1, "item": {"@type": "Person", "name": f["name"], "jobTitle": f["headline"],
+     **({"address": {"@type": "PostalAddress", "addressLocality": f["location"]}} if f.get("location") else {}),
+     **({"sameAs": [f["linkedin"]]} if f.get("linkedin") else {}), "knowsAbout": ["IFS", *(m.strip() for m in (f.get("modules") or "").split(",") if m.strip())]}}
+    for i, f in enumerate(freelancers)]}
 fl_form = ('<form class="form" data-kind="freelancer profile" data-done="Profile received. We review each one before it goes live.">'
            '<label>Full name<input type="text" name="name" required></label><label>Email (not shown publicly)<input type="email" name="email" required></label>'
            '<label class="full">Headline<input type="text" name="headline" placeholder="e.g. IFS Finance Consultant, 8 years, Apps 10 and Cloud" required></label>'
@@ -572,11 +597,23 @@ fl_form = ('<form class="form" data-kind="freelancer profile" data-done="Profile
            '<label class="check full"><input type="checkbox" name="consent" required> Show my profile publicly on findifsjobs</label>'
            '<div class="full"><button class="btn" type="submit">Get featured</button></div><p class="msg full" hidden></p></form>')
 three = lambda items: '<div class="three">' + "".join(f'<div><h3>{e(a)}</h3><p class="muted small">{e(b)}</p></div>' for a, b in items) + "</div>"
-page("freelancers/", "IFS freelancers: get featured free | findifsjobs",
-     "IFS contractors and freelancers can add a free profile to findifsjobs so IFS partners and customers can find them. No fee, no commission.",
-     hero("For IFS freelancers", "Get featured on findifsjobs, free", "If you contract in IFS, add your profile. Partners and IFS customers looking for project cover will see your modules, availability and how to reach you. No fee, no commission.")
-     + f'<div class="wrap">{three([("A profile on the board", "Your headline, modules, IFS versions, location and availability."), ("Direct contact", "Companies reach you through your LinkedIn profile. We do not sit in the middle."), ("Free, and yours to remove", "Ask at any time and your profile comes down.")])}'
-     + (f'<h2 style="font-size:1.1rem">Featured freelancers</h2><ul class="grid">{fl_cells}</ul><h2 style="font-size:1.1rem">Add your profile</h2>{fl_form}</div>' if freelancers else f'{fl_form}<h2 style="font-size:1.1rem">Featured freelancers</h2><ul class="grid">{fl_cells}</ul></div>'), active="freelancers/", crumbs=[("Freelancers", None)], priority="0.7")
+fl_join = (f'<section class="fjoin" id="join"><div class="fpitch"><p class="fk">For IFS freelancers</p><h2>Contract in IFS? Get featured, free.</h2>'
+           f'<ul class="fticks"><li><b>A profile on the board.</b> Headline, modules, IFS versions, location and availability.</li>'
+           f'<li><b>Direct contact.</b> Companies reach you on LinkedIn. We do not sit in the middle and take no commission.</li>'
+           f'<li><b>Yours to remove.</b> Ask at any time and your profile comes down.</li></ul></div>{fl_form}</section>')
+if freelancers:
+    page("freelancers/", "IFS freelancers and contractors available now | findifsjobs",
+         f"{plural(len(freelancers), 'IFS freelancer')} available for projects, with modules, IFS versions, location and direct LinkedIn contact. IFS contractors can add a free profile.",
+         hero("IFS freelancers", 'IFS freelancers, <em>available now</em>', "Independent IFS consultants and developers you can contact directly. No agency in the middle and no fee.",
+              extra=f'<div class="fhero-cta"><a class="btn" href="#featured">Browse freelancers</a><a class="pbtn" href="#join">Add your profile, free</a></div>')
+         + f'<div class="wrap"><div class="fhead" id="featured"><h2>Featured IFS freelancers</h2><span class="fcount">{len(freelancers)} available</span></div>'
+           f'<ul class="fgrid">{fl_cells}</ul>{fl_join}</div>',
+         active="freelancers/", ld=[fl_ld], crumbs=[("Freelancers", None)], priority="0.8")
+else:
+    page("freelancers/", "IFS freelancers: get featured free | findifsjobs",
+         "IFS contractors and freelancers can add a free profile to findifsjobs so IFS partners and customers can find them. No fee, no commission.",
+         hero("For IFS freelancers", "Get featured on findifsjobs, free", "If you contract in IFS, add your profile. Partners and IFS customers looking for project cover will see your modules, availability and how to reach you. No fee, no commission.")
+         + f'<div class="wrap">{fl_join}</div>', active="freelancers/", crumbs=[("Freelancers", None)], priority="0.7")
 
 # ---- news
 def nart(n, big=False):
