@@ -1,11 +1,11 @@
 {
  "month": "2026-10",
- "as_of": "2026-10-30",
- "roles": 168,
+ "as_of": "2026-10-31",
+ "roles": 170,
  "employers": 39,
  "countries": 22,
- "cloud": 59,
- "remote": 58,
+ "cloud": 60,
+ "remote": 59,
  "by_area": [
   [
    "Architecture",
@@ -17,7 +17,7 @@
   ],
   [
    "Multi-module",
-   23
+   24
   ],
   [
    "Finance",
@@ -44,7 +44,7 @@
    8
   ],
   [
-   "Field Service",
+   "Sales / Presales",
    4
   ]
  ],
@@ -93,11 +93,11 @@
  "by_employer": [
   [
    "IFS",
-   54
+   55
   ],
   [
    "Arcwide",
-   23
+   24
   ],
   [
    "IT Works Recruitment",
@@ -135,11 +135,11 @@
  "by_type": [
   [
    "IFS partner",
-   73
+   74
   ],
   [
    "IFS vendor",
-   54
+   55
   ],
   [
    "Recruiter",
@@ -157,7 +157,7 @@
  "role_mix": [
   [
    "Functional consultant",
-   71
+   72
   ],
   [
    "Technical and developer",
