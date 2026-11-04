@@ -1,11 +1,11 @@
 {
  "month": "2026-11",
- "as_of": "2026-11-03",
- "roles": 170,
+ "as_of": "2026-11-04",
+ "roles": 172,
  "employers": 39,
  "countries": 22,
  "cloud": 60,
- "remote": 59,
+ "remote": 60,
  "by_area": [
   [
    "Architecture",
@@ -13,7 +13,7 @@
   ],
   [
    "Technical / Development",
-   26
+   28
   ],
   [
    "Multi-module",
@@ -51,7 +51,7 @@
  "by_country": [
   [
    "United States",
-   24
+   25
   ],
   [
    "Sri Lanka",
@@ -59,7 +59,7 @@
   ],
   [
    "United Kingdom",
-   16
+   17
   ],
   [
    "Sweden",
@@ -93,7 +93,7 @@
  "by_employer": [
   [
    "IFS",
-   55
+   57
   ],
   [
    "Arcwide",
@@ -139,7 +139,7 @@
   ],
   [
    "IFS vendor",
-   55
+   57
   ],
   [
    "Recruiter",
@@ -157,11 +157,11 @@
  "role_mix": [
   [
    "Functional consultant",
-   72
+   74
   ],
   [
    "Technical and developer",
-   26
+   28
   ],
   [
    "Solution architect",
