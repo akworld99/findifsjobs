@@ -1,10 +1,10 @@
 {
  "month": "2026-11",
- "as_of": "2026-11-04",
- "roles": 172,
+ "as_of": "2026-11-05",
+ "roles": 173,
  "employers": 39,
  "countries": 22,
- "cloud": 60,
+ "cloud": 61,
  "remote": 60,
  "by_area": [
   [
@@ -44,7 +44,7 @@
    8
   ],
   [
-   "Sales / Presales",
+   "Projects",
    4
   ]
  ],
@@ -55,7 +55,7 @@
   ],
   [
    "Sri Lanka",
-   20
+   21
   ],
   [
    "United Kingdom",
@@ -124,18 +124,18 @@
    5
   ],
   [
-   "Enterprise Analytics",
+   "Inivos",
    4
   ],
   [
-   "Eqeep",
+   "Enterprise Analytics",
    4
   ]
  ],
  "by_type": [
   [
    "IFS partner",
-   74
+   75
   ],
   [
    "IFS vendor",
@@ -157,7 +157,7 @@
  "role_mix": [
   [
    "Functional consultant",
-   74
+   75
   ],
   [
    "Technical and developer",
