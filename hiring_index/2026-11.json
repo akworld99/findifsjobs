@@ -1,7 +1,7 @@
 {
  "month": "2026-11",
- "as_of": "2026-11-05",
- "roles": 173,
+ "as_of": "2026-11-06",
+ "roles": 174,
  "employers": 39,
  "countries": 22,
  "cloud": 61,
@@ -32,11 +32,11 @@
    13
   ],
   [
-   "EAM / Maintenance",
-   10
+   "Manufacturing",
+   11
   ],
   [
-   "Manufacturing",
+   "EAM / Maintenance",
    10
   ],
   [
@@ -55,7 +55,7 @@
   ],
   [
    "Sri Lanka",
-   21
+   22
   ],
   [
    "United Kingdom",
@@ -120,12 +120,12 @@
    6
   ],
   [
-   "WIA Systems",
+   "Inivos",
    5
   ],
   [
-   "Inivos",
-   4
+   "WIA Systems",
+   5
   ],
   [
    "Enterprise Analytics",
@@ -135,7 +135,7 @@
  "by_type": [
   [
    "IFS partner",
-   75
+   76
   ],
   [
    "IFS vendor",
@@ -157,7 +157,7 @@
  "role_mix": [
   [
    "Functional consultant",
-   75
+   76
   ],
   [
    "Technical and developer",
