@@ -1,7 +1,7 @@
 {
  "month": "2026-11",
- "as_of": "2026-11-06",
- "roles": 174,
+ "as_of": "2026-11-07",
+ "roles": 175,
  "employers": 39,
  "countries": 22,
  "cloud": 61,
@@ -21,7 +21,7 @@
   ],
   [
    "Finance",
-   20
+   21
   ],
   [
    "Supply Chain",
@@ -66,16 +66,16 @@
    16
   ],
   [
+   "Netherlands",
+   10
+  ],
+  [
    "Australia",
    10
   ],
   [
    "Japan",
    10
-  ],
-  [
-   "Netherlands",
-   9
   ],
   [
    "India",
@@ -120,22 +120,22 @@
    6
   ],
   [
+   "Eqeep",
+   5
+  ],
+  [
    "Inivos",
    5
   ],
   [
    "WIA Systems",
    5
-  ],
-  [
-   "Enterprise Analytics",
-   4
   ]
  ],
  "by_type": [
   [
    "IFS partner",
-   76
+   77
   ],
   [
    "IFS vendor",
@@ -157,7 +157,7 @@
  "role_mix": [
   [
    "Functional consultant",
-   76
+   77
   ],
   [
    "Technical and developer",
