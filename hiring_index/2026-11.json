@@ -1,47 +1,47 @@
 {
  "month": "2026-11",
- "as_of": "2026-11-09",
- "roles": 175,
- "employers": 39,
- "countries": 22,
- "cloud": 61,
- "remote": 60,
+ "as_of": "2026-11-10",
+ "roles": 143,
+ "employers": 17,
+ "countries": 18,
+ "cloud": 37,
+ "remote": 40,
  "by_area": [
   [
    "Architecture",
-   31
+   27
   ],
   [
    "Technical / Development",
-   28
-  ],
-  [
-   "Multi-module",
-   24
+   20
   ],
   [
    "Finance",
-   21
+   18
+  ],
+  [
+   "Multi-module",
+   15
   ],
   [
    "Supply Chain",
-   13
+   14
   ],
   [
    "Project Management",
-   13
-  ],
-  [
-   "Manufacturing",
    11
   ],
   [
-   "EAM / Maintenance",
+   "Manufacturing",
    10
   ],
   [
+   "EAM / Maintenance",
+   9
+  ],
+  [
    "Support / Admin",
-   8
+   5
   ],
   [
    "Projects",
@@ -50,58 +50,54 @@
  ],
  "by_country": [
   [
-   "United States",
-   25
+   "Sri Lanka",
+   23
   ],
   [
-   "Sri Lanka",
-   22
+   "United States",
+   18
   ],
   [
    "United Kingdom",
-   17
+   11
   ],
   [
    "Sweden",
-   16
-  ],
-  [
-   "Netherlands",
-   10
-  ],
-  [
-   "Australia",
-   10
+   11
   ],
   [
    "Japan",
    10
   ],
   [
-   "India",
-   5
+   "Netherlands",
+   9
   ],
   [
-   "Switzerland",
-   5
+   "Australia",
+   9
   ],
   [
    "Austria",
    4
+  ],
+  [
+   "India",
+   3
+  ],
+  [
+   "Switzerland",
+   3
   ]
  ],
  "by_employer": [
   [
    "IFS",
-   57
+   61
   ],
   [
    "Arcwide",
    24
-  ],
-  [
-   "IT Works Recruitment",
-   9
   ],
   [
    "Cubiq Recruitment",
@@ -130,50 +126,50 @@
   [
    "WIA Systems",
    5
+  ],
+  [
+   "Enterprise Analytics",
+   4
   ]
  ],
  "by_type": [
   [
    "IFS partner",
-   77
+   67
   ],
   [
    "IFS vendor",
-   57
+   61
   ],
   [
    "Recruiter",
-   31
+   14
   ],
   [
    "IFS customer",
-   9
-  ],
-  [
-   "IT services firm",
    1
   ]
  ],
  "role_mix": [
   [
    "Functional consultant",
-   77
+   62
   ],
   [
    "Technical and developer",
-   28
+   20
   ],
   [
    "Solution architect",
-   31
+   27
   ],
   [
    "Project manager",
-   13
+   11
   ],
   [
    "Support",
-   8
+   5
   ]
  ]
 }
