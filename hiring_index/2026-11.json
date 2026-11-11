@@ -1,7 +1,7 @@
 {
  "month": "2026-11",
- "as_of": "2026-11-10",
- "roles": 143,
+ "as_of": "2026-11-11",
+ "roles": 144,
  "employers": 17,
  "countries": 18,
  "cloud": 37,
@@ -9,7 +9,7 @@
  "by_area": [
   [
    "Architecture",
-   27
+   26
   ],
   [
    "Technical / Development",
@@ -20,12 +20,12 @@
    18
   ],
   [
-   "Multi-module",
-   15
+   "Supply Chain",
+   16
   ],
   [
-   "Supply Chain",
-   14
+   "Multi-module",
+   15
   ],
   [
    "Project Management",
@@ -51,7 +51,7 @@
  "by_country": [
   [
    "Sri Lanka",
-   23
+   24
   ],
   [
    "United States",
@@ -66,16 +66,16 @@
    11
   ],
   [
+   "Netherlands",
+   10
+  ],
+  [
    "Japan",
    10
   ],
   [
-   "Netherlands",
-   9
-  ],
-  [
    "Australia",
-   9
+   8
   ],
   [
    "Austria",
@@ -93,7 +93,7 @@
  "by_employer": [
   [
    "IFS",
-   61
+   62
   ],
   [
    "Arcwide",
@@ -139,7 +139,7 @@
   ],
   [
    "IFS vendor",
-   61
+   62
   ],
   [
    "Recruiter",
@@ -153,7 +153,7 @@
  "role_mix": [
   [
    "Functional consultant",
-   62
+   63
   ],
   [
    "Technical and developer",
@@ -161,7 +161,7 @@
   ],
   [
    "Solution architect",
-   27
+   26
   ],
   [
    "Project manager",
