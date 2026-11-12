@@ -1,7 +1,7 @@
 {
  "month": "2026-11",
- "as_of": "2026-11-11",
- "roles": 144,
+ "as_of": "2026-11-12",
+ "roles": 142,
  "employers": 17,
  "countries": 18,
  "cloud": 37,
@@ -13,7 +13,7 @@
   ],
   [
    "Technical / Development",
-   20
+   19
   ],
   [
    "Finance",
@@ -25,33 +25,33 @@
   ],
   [
    "Multi-module",
-   15
+   14
   ],
   [
    "Project Management",
    11
   ],
   [
+   "EAM / Maintenance",
+   10
+  ],
+  [
    "Manufacturing",
    10
   ],
   [
-   "EAM / Maintenance",
-   9
-  ],
-  [
-   "Support / Admin",
-   5
-  ],
-  [
    "Projects",
+   4
+  ],
+  [
+   "Sales / Presales",
    4
   ]
  ],
  "by_country": [
   [
    "Sri Lanka",
-   24
+   23
   ],
   [
    "United States",
@@ -82,18 +82,18 @@
    4
   ],
   [
-   "India",
+   "Switzerland",
    3
   ],
   [
-   "Switzerland",
-   3
+   "India",
+   2
   ]
  ],
  "by_employer": [
   [
    "IFS",
-   62
+   60
   ],
   [
    "Arcwide",
@@ -139,7 +139,7 @@
   ],
   [
    "IFS vendor",
-   62
+   60
   ],
   [
    "Recruiter",
@@ -157,7 +157,7 @@
   ],
   [
    "Technical and developer",
-   20
+   19
   ],
   [
    "Solution architect",
@@ -169,7 +169,7 @@
   ],
   [
    "Support",
-   5
+   4
   ]
  ]
 }
