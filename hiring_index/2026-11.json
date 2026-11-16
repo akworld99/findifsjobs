@@ -1,22 +1,22 @@
 {
  "month": "2026-11",
- "as_of": "2026-11-15",
- "roles": 142,
+ "as_of": "2026-11-16",
+ "roles": 140,
  "employers": 17,
  "countries": 18,
- "cloud": 39,
- "remote": 40,
+ "cloud": 38,
+ "remote": 39,
  "by_area": [
   [
    "Architecture",
    26
   ],
   [
-   "Technical / Development",
-   19
+   "Supply Chain",
+   18
   ],
   [
-   "Supply Chain",
+   "Technical / Development",
    18
   ],
   [
@@ -28,15 +28,15 @@
    14
   ],
   [
-   "Manufacturing",
-   11
-  ],
-  [
    "Project Management",
    11
   ],
   [
    "EAM / Maintenance",
+   10
+  ],
+  [
+   "Manufacturing",
    10
   ],
   [
@@ -51,11 +51,11 @@
  "by_country": [
   [
    "Sri Lanka",
-   23
+   22
   ],
   [
    "United States",
-   18
+   17
   ],
   [
    "United Kingdom",
@@ -93,7 +93,7 @@
  "by_employer": [
   [
    "IFS",
-   60
+   59
   ],
   [
    "Arcwide",
@@ -116,12 +116,12 @@
    5
   ],
   [
-   "Inivos",
+   "WIA Systems",
    5
   ],
   [
-   "WIA Systems",
-   5
+   "Inivos",
+   4
   ],
   [
    "InfoConsulting",
@@ -135,11 +135,11 @@
  "by_type": [
   [
    "IFS partner",
-   67
+   66
   ],
   [
    "IFS vendor",
-   60
+   59
   ],
   [
    "Recruiter",
@@ -157,7 +157,7 @@
   ],
   [
    "Technical and developer",
-   19
+   18
   ],
   [
    "Solution architect",
