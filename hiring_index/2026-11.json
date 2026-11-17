@@ -1,11 +1,11 @@
 {
  "month": "2026-11",
- "as_of": "2026-11-16",
- "roles": 140,
+ "as_of": "2026-11-17",
+ "roles": 141,
  "employers": 17,
  "countries": 18,
  "cloud": 38,
- "remote": 39,
+ "remote": 40,
  "by_area": [
   [
    "Architecture",
@@ -29,7 +29,7 @@
   ],
   [
    "Project Management",
-   11
+   12
   ],
   [
    "EAM / Maintenance",
@@ -55,7 +55,7 @@
   ],
   [
    "United States",
-   17
+   18
   ],
   [
    "United Kingdom",
@@ -93,7 +93,7 @@
  "by_employer": [
   [
    "IFS",
-   59
+   60
   ],
   [
    "Arcwide",
@@ -139,7 +139,7 @@
   ],
   [
    "IFS vendor",
-   59
+   60
   ],
   [
    "Recruiter",
@@ -165,7 +165,7 @@
   ],
   [
    "Project manager",
-   11
+   12
   ],
   [
    "Support",
