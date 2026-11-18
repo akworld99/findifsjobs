@@ -8,7 +8,7 @@ on:
   workflow_dispatch:        # lets you press "Run workflow" by hand
   push:
     branches: [main]
-    paths-ignore: ["jobs.json", "last_run.txt", "indexnow_sent.txt", "hiring_index/**", "indexnow_status.txt", "logos/**", "domain_status.txt"]   # the bot's own data commit must not trigger another run
+    paths-ignore: ["jobs.json", "last_run.txt", "indexnow_sent.txt", "hiring_index/**", "indexnow_status.txt", "logos/**", "domain_status.txt", "google_indexing_sent.txt", "google_indexing_status.txt"]   # the bot's own data commit must not trigger another run
 
 permissions:
   contents: write   # commit the refreshed jobs.json
@@ -75,4 +75,17 @@ jobs:
           python indexnow.py | tee indexnow_status.txt
           git add indexnow_status.txt; git add indexnow_sent.txt 2>/dev/null || true
           git diff --cached --quiet || git commit -m "IndexNow: record submitted pages"
+          git pull -q --rebase && git push || true
+
+      - name: Tell Google about new and closed job pages
+        # Uses the Google Indexing API, which Google accepts for job posting pages.
+        # Does nothing until the GOOGLE_INDEXING_KEY secret is added.
+        env:
+          GOOGLE_INDEXING_KEY: ${{ secrets.GOOGLE_INDEXING_KEY }}
+        run: |
+          if [ -z "$GOOGLE_INDEXING_KEY" ]; then echo "No GOOGLE_INDEXING_KEY secret yet, skipping"; exit 0; fi
+          pip install -q google-auth requests
+          python google_indexing.py | tee google_indexing_status.txt || true
+          git add google_indexing_status.txt; git add google_indexing_sent.txt 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "Google Indexing API: record notified job pages"
           git pull -q --rebase && git push || true
