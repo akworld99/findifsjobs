@@ -1,22 +1,22 @@
 {
  "month": "2026-11",
- "as_of": "2026-11-17",
- "roles": 141,
+ "as_of": "2026-11-18",
+ "roles": 143,
  "employers": 17,
- "countries": 18,
- "cloud": 38,
- "remote": 40,
+ "countries": 19,
+ "cloud": 39,
+ "remote": 42,
  "by_area": [
   [
    "Architecture",
    26
   ],
   [
-   "Supply Chain",
-   18
+   "Technical / Development",
+   19
   ],
   [
-   "Technical / Development",
+   "Supply Chain",
    18
   ],
   [
@@ -29,7 +29,7 @@
   ],
   [
    "Project Management",
-   12
+   13
   ],
   [
    "EAM / Maintenance",
@@ -55,7 +55,7 @@
   ],
   [
    "United States",
-   18
+   19
   ],
   [
    "United Kingdom",
@@ -93,11 +93,11 @@
  "by_employer": [
   [
    "IFS",
-   60
+   61
   ],
   [
    "Arcwide",
-   27
+   28
   ],
   [
    "Cubiq Recruitment",
@@ -135,11 +135,11 @@
  "by_type": [
   [
    "IFS partner",
-   66
+   67
   ],
   [
    "IFS vendor",
-   60
+   61
   ],
   [
    "Recruiter",
@@ -157,7 +157,7 @@
   ],
   [
    "Technical and developer",
-   18
+   19
   ],
   [
    "Solution architect",
@@ -165,7 +165,7 @@
   ],
   [
    "Project manager",
-   12
+   13
   ],
   [
    "Support",
