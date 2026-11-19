@@ -338,6 +338,37 @@ def salary(pay, country):
     else:
         val = {"value": nums[0]}
     return {"@type": "MonetaryAmount", "currency": cur, "value": {"@type": "QuantitativeValue", **val, "unitText": unit}}
+
+
+# Google asks for two-letter country codes in job markup; names are kept as a fallback.
+ISO = {"Argentina": "AR", "Australia": "AU", "Austria": "AT", "Bahrain": "BH", "Bangladesh": "BD", "Belgium": "BE", "Brazil": "BR", "Bulgaria": "BG",
+       "Canada": "CA", "Chile": "CL", "China": "CN", "Colombia": "CO", "Croatia": "HR", "Czech Republic": "CZ", "Czechia": "CZ", "Denmark": "DK",
+       "Egypt": "EG", "Estonia": "EE", "Finland": "FI", "France": "FR", "Germany": "DE", "Greece": "GR", "Hong Kong": "HK", "Hungary": "HU",
+       "Iceland": "IS", "India": "IN", "Indonesia": "ID", "Ireland": "IE", "Israel": "IL", "Italy": "IT", "Japan": "JP", "Kenya": "KE", "Kuwait": "KW",
+       "Latvia": "LV", "Lithuania": "LT", "Luxembourg": "LU", "Malaysia": "MY", "Mexico": "MX", "Morocco": "MA", "Netherlands": "NL", "New Zealand": "NZ",
+       "Nigeria": "NG", "Norway": "NO", "Oman": "OM", "Pakistan": "PK", "Peru": "PE", "Philippines": "PH", "Poland": "PL", "Portugal": "PT", "Qatar": "QA",
+       "Romania": "RO", "Saudi Arabia": "SA", "Serbia": "RS", "Singapore": "SG", "Slovakia": "SK", "Slovenia": "SI", "South Africa": "ZA", "South Korea": "KR",
+       "Spain": "ES", "Sri Lanka": "LK", "Sweden": "SE", "Switzerland": "CH", "Thailand": "TH", "Turkey": "TR", "Ukraine": "UA",
+       "United Arab Emirates": "AE", "United Kingdom": "GB", "United States": "US", "Vietnam": "VN"}
+# Some feeds attach a region from another country (a Swedish job tagged "England"). Regions listed here
+# belong to one country; when the job's country disagrees, the region is left out instead of published wrong.
+REGION_HOME = {"England": "United Kingdom", "Scotland": "United Kingdom", "Wales": "United Kingdom", "Northern Ireland": "United Kingdom",
+               "Western Province": "Sri Lanka", "Central Province": "Sri Lanka", "Southern Province": "Sri Lanka", "North Western Province": "Sri Lanka",
+               "Stockholm County": "Sweden", "Uusimaa": "Finland", "Capital Region": "Denmark", "North Brabant": "Netherlands", "Gelderland": "Netherlands",
+               "Utrecht": "Netherlands", "UT": "Netherlands", "New South Wales": "Australia", "Victoria": "Australia", "Queensland": "Australia",
+               "West Bengal": "India", "Maharashtra": "India", "Karnataka": "India", "Tamil Nadu": "India", "Ontario": "Canada", "Quebec": "Canada",
+               "Bavaria": "Germany", "Dubai": "United Arab Emirates", "Abu Dhabi": "United Arab Emirates", "Tokyo": "Japan", "São Paulo": "Brazil",
+               "Rio de Janeiro": "Brazil"}
+region_ok = lambda state, country: bool(state) and REGION_HOME.get(state, country) == country
+
+
+def logo_url(name):
+    """Absolute address of a company's logo, for hiringOrganization.logo in job markup."""
+    l = LOGOS.get(re.sub(r"^ifs \(.*\)$", "ifs", name.lower()), {})
+    src = l.get("icon") or l.get("wide")
+    return f"{SITE}/{src}" if src else None
+
+
 for j in jobs:
     root = "../../"
     facts = [("Employer", j["company"]), ("Employer type", j.get("company_type")), ("Location", j["loc"]),
@@ -370,10 +401,12 @@ for j in jobs:
         valid = (dt.date.fromisoformat((j.get("last_seen") or TODAY.isoformat())[:10]) + dt.timedelta(days=30)).isoformat()
         jp = {"@context": "https://schema.org", "@type": "JobPosting", "title": j["title"], "description": f"<p>{e(about)}</p>" + (f"<p>{e(j['excerpt'])}</p>" if j.get("excerpt") else ""),
               "datePosted": j["when"][:10], "validThrough": valid, "directApply": False, "url": f"{SITE}/{j['path']}",
-              "hiringOrganization": {"@type": "Organization", "name": j["company"], **({"sameAs": partner["web"]} if partner and partner.get("web") else {})},
-              "jobLocation": {"@type": "Place", "address": {"@type": "PostalAddress", "addressCountry": j["country"],
+              "identifier": {"@type": "PropertyValue", "name": j["company"], "value": j["slug"][-6:]},
+              "hiringOrganization": {"@type": "Organization", "name": j["company"], **({"sameAs": partner["web"]} if partner and partner.get("web") else {}),
+                                     **({"logo": logo_url(j["company"])} if logo_url(j["company"]) else {})},
+              "jobLocation": {"@type": "Place", "address": {"@type": "PostalAddress", "addressCountry": ISO.get(j["country"], j["country"]),
                                                             **({"addressLocality": j["city"]} if known(j.get("city")) and j["city"] != "Remote" else {}),
-                                                            **({"addressRegion": j["state"]} if j.get("state") else {}),
+                                                            **({"addressRegion": j["state"]} if region_ok(j.get("state"), j["country"]) else {}),
                                                             **({"postalCode": j["postal"]} if j.get("postal") else {}),
                                                             **({"streetAddress": j["street"]} if j.get("street") else {})}},
               "industry": "Enterprise software (IFS ERP)", "occupationalCategory": j.get("area") or "IFS"}
@@ -386,9 +419,12 @@ for j in jobs:
             jp["jobLocationType"] = "TELECOMMUTE"
             jp["applicantLocationRequirements"] = {"@type": "Country", "name": j["country"]}
         ld.append(jp)
+    # Breadcrumb through the country page (when there is one) rather than repeating the home page.
+    jc = j.get("country")
+    crumb = [(f"IFS jobs in {CNAME.get(jc, jc)}", cpath(jc))] if jc in countries else []
     page(j["path"], f"{j['title']} at {j['company']}{', ' + j['loc'] if j['loc'] else ''} | findifsjobs",
          f"{j['title']} at {j['company']}{' in ' + j['loc'] if j['loc'] else ''}. {j.get('area') or 'IFS'} role. See the details and apply on the original posting.",
-         body, ld=ld, crumbs=[("IFS jobs", ""), (j["title"], None)], priority="0.7", lastmod=j["when"][:10])
+         body, ld=ld, crumbs=crumb + [(j["title"], None)], priority="0.7", lastmod=j["when"][:10])
 
 
 # ---- landing pages
@@ -458,11 +494,49 @@ toolbar = ('<div class="toolbar"><input type="search" class="plain" id="p-q" pla
            f'<select id="p-region" aria-label="Region"><option value="">All regions</option>{"".join(f"""<option value="{k}">{v[0]}</option>""" for k, v in REG.items())}</select>'
            '<select id="p-kind" aria-label="Type"><option value="">All types</option><option value="S">IFS specialists</option><option value="B">ERP boutiques</option><option value="G">Global firms</option></select>'
            '<select id="p-sort" aria-label="Sort"><option value="score">Emerging first</option><option value="az">A to Z</option><option value="tier">Highest tier first</option></select></div>')
-page("partners/", f"IFS partner companies: {len(partners)} IFS implementation partners ({TODAY.year}) | findifsjobs",
-     f"Directory of {len(partners)} verified IFS partner companies across eight regions: channel, service and implementation partners with tier, size, focus and careers links.",
-     hero("Partner directory", f"{len(partners)} IFS partner companies, emerging firms first", "Every firm is confirmed as an IFS partner by the IFS directory, an IFS announcement or an IFS event listing.")
-     + f'<div class="wrap">{toolbar}<p class="muted small" id="p-count">{len(partners)} of {len(partners)} partners</p><ul class="grid" id="p-list">{cells}</ul><section class="stack"><h2>IFS partners by country</h2>{links([(c, f"ifs-partners/{slug(c)}/", len(v)) for c, v in PC_PAGES.items()], "../")}</section>{mstrip("../")}</div>',
-     active="partners/", crumbs=[("Partner directory", None)], priority="0.8")
+# The directory page itself is built further down, once the industry pages it links to exist.
+
+
+def similar_partners(p, k=6):
+    """Partners closest to p: same home region first, then a shared region, same type preferred."""
+    near = [x for x in partners if x is not p and (x.get("home") == p.get("home") or set(x["r"]) & set(p["r"]))]
+    return sorted(near, key=lambda x: (x.get("home") != p.get("home"), x["kind"] != p["kind"], -x["score"], x["n"]))[:k]
+
+
+_global_hq = lambda p: p["hq"].strip().lower() in ("global", "worldwide")
+hq_phrase = lambda p: "with offices worldwide" if _global_hq(p) else f"headquartered in {p['hq']}"
+soft_lower = lambda s: s[0].lower() + s[1:] if re.match(r"[A-Z][a-z]", s) else s   # keeps IFS, EAM, A&D as written
+
+
+def partner_about(p):
+    """A plain-language paragraph from the partner's verified facts."""
+    kind = {"S": "an IFS specialist", "B": "an ERP boutique", "G": "a global consulting firm with an IFS practice"}[p["kind"]]
+    regions = [REG[x][0] for x in p["r"]]
+    s = [f"{p['n']} is {kind} {hq_phrase(p)}" + (f", founded in {p['founded']}" if p.get("founded") else "") + "."]
+    s.append(f"It is listed as an IFS {p['tier']} partner." if p.get("tier") else "Its IFS partner level is not published in the sources we use.")
+    s.append(f"Its main focus is {soft_lower(p['focus'])}." if p.get("focus") else "")
+    s.append(f"It works in {', '.join(regions[:-1]) + ' and ' + regions[-1] if len(regions) > 1 else regions[0]}." if regions else "")
+    s.append(f"Size: {p['size']}." if p.get("size") else "")
+    s.append(f"IFS recognition: {p['awards']}." if p.get("awards") else "")
+    n = len(p["jobs"])
+    s.append(f"findifsjobs shows {plural(n, 'open IFS role')} at {p['n']} today." if n else f"No open IFS roles from {p['n']} are on the board today.")
+    return " ".join(x for x in s if x)
+
+
+def partner_faq(p):
+    regions = ", ".join(REG[x][0] for x in p["r"])
+    src = re.sub(r"^https?://(www\.)?([^/]+).*$", r"\2", p.get("src") or "")
+    titles = ", ".join(j["title"] for j in p["jobs"][:3])
+    return faq([
+        (f"Is {p['n']} an IFS partner?", f"Yes. {p['n']} is an IFS partner" + (f", listed at {p['tier']} level" if p.get("tier") else "")
+         + (f". Source: {src}." if src else ".")),
+        (f"Where is {p['n']} based?", f"{p['n']} " + ("has offices worldwide" if _global_hq(p) else f"is headquartered in {p['hq']}")
+         + (f" and works in {regions}." if regions else ".")),
+        (f"What does {p['n']} specialise in?", f"{p['focus']}." if p.get("focus") else f"{p['blurb']}"),
+        (f"Is {p['n']} hiring IFS consultants?", (f"Yes. findifsjobs lists {plural(len(p['jobs']), 'open IFS role')} at {p['n']}, including {titles}." if p["jobs"]
+                                                  else f"There are no open IFS roles from {p['n']} on findifsjobs today. Their own careers page may list roles we have not picked up.")),
+    ])
+
 
 for p in partners:
     root = "../../"
@@ -483,14 +557,21 @@ for p in partners:
     jobs_html = (f'<section class="stack"><h2>Open IFS jobs at {e(p["n"])}</h2><ul class="rows">{"".join(job_row(j, root) for j in p["jobs"])}</ul></section>' if p["jobs"]
                  else f'<section class="stack"><h2>Open IFS jobs at {e(p["n"])}</h2><p class="muted">No open roles from {e(p["n"])} are on the board today. '
                       + (ext(p.get("careers"), "Check their careers page") or "Check their website") + ".</p></section>")
+    sim = similar_partners(p)
+    sim_html = (f'<section class="stack"><h2>Similar IFS partners</h2>{links([(x["n"], x["path"], None) for x in sim], root)}</section>' if sim else "")
+    pfaq, pfaq_ld = partner_faq(p)
     body = (hero("IFS partner", f'<span class="pagelogo">{logo(p["n"], root, True)}<span>{e(p["n"])}</span></span>', e(p["blurb"]), h1cls="small")
             + f'<div class="wrap"><div class="article"><div class="stack">'
+            + f'<div class="prose"><h2>About {e(p["n"])}</h2><p>{e(partner_about(p))}</p></div>'
             + (f'<div class="prose"><h2>What stands out</h2><p>{e(p["sig"])}</p></div>' if p.get("sig") else "")
-            + f'{table}<div class="tags">{tags_for(p)}</div>{jobs_html}</div><div class="stack">{rank_html}{bd}{f"""<div class="note"><h3>More partners</h3><a class="small" href="{root}ifs-partners/{slug(pc)}/">IFS partners in {e(THE.get(pc, pc))} &rarr;</a></div>""" if pc in PC_PAGES else ""}<div class="note"><h3>Links</h3><div class="cell" style="border:0;padding:0;background:none"><div class="foot" style="border:0;padding:0;flex-direction:column">{pl}</div></div></div></div></div>{mstrip(root)}</div>')
+            + f'{table}<div class="tags">{tags_for(p)}</div>{jobs_html}{sim_html}{pfaq}</div><div class="stack">{rank_html}{bd}{f"""<div class="note"><h3>More partners</h3><a class="small" href="{root}ifs-partners/{slug(pc)}/">IFS partners in {e(THE.get(pc, pc))} &rarr;</a></div>""" if pc in PC_PAGES else ""}<div class="note"><h3>Links</h3><div class="cell" style="border:0;padding:0;background:none"><div class="foot" style="border:0;padding:0;flex-direction:column">{pl}</div></div></div></div></div>{mstrip(root)}</div>')
+    org = {"@context": "https://schema.org", "@type": "Organization", "name": p["n"], **({"url": p["web"]} if p.get("web") else {}), "description": p["blurb"],
+           **({"logo": logo_url(p["n"])} if logo_url(p["n"]) else {}), **({"foundingDate": str(p["founded"])} if p.get("founded") else {}),
+           "areaServed": [REG[x][0] for x in p["r"]],
+           **({"knowsAbout": [x.strip() for x in re.split(r"[;,]", p["focus"]) if x.strip()]} if p.get("focus") else {})}
     page(p["path"], f"{p['n']}: IFS partner profile, jobs and facts | findifsjobs",
          f"{p['n']} is an IFS partner based in {p['hq']}. {p['blurb']} Tier, size, focus, awards and open IFS jobs.", body, active="partners/",
-         ld=[{"@context": "https://schema.org", "@type": "Organization", "name": p["n"], **({"url": p["web"]} if p.get("web") else {}), "description": p["blurb"]}],
-         crumbs=[("Partner directory", "partners/"), (p["n"], None)], priority="0.6")
+         ld=[org, pfaq_ld], crumbs=[("Partner directory", "partners/"), (p["n"], None)], priority="0.6")
 
 # ---- top 10 by region
 METHOD = ('<p class="method"><b>How the ranking works.</b> Scores guide the list and the final order is an editorial decision. Points for being IFS-only (3) or an ERP boutique (1.5), a recent growth signal such as a merger, new tier or new market (2), '
@@ -1079,6 +1160,45 @@ page("ifs-hiring-index/", "IFS Hiring Index: monthly IFS job market figures | fi
      + '<div class="wrap"><ul class="grid">' + "".join(f'<li class="cell"><h3><a href="{s["month"]}/" style="color:var(--ink)">{mname(s["month"])}</a></h3><p class="sum">{s["roles"]} open roles · {s["employers"]} employers · {round(100 * s["cloud"] / s["roles"])}% name IFS Cloud</p>'
                                                          f'<div class="btns"><a class="pbtn primary" href="{s["month"]}/">See the figures<span aria-hidden="true">&rarr;</span></a></div></li>' for s in snaps) + "</ul></div>",
      active="ifs-hiring-report/", crumbs=[("Hiring Index", None)], priority="0.8")
+
+# ---- partner directory (built here so it can link to the industry and country pages)
+_kinds = Counter(p["kind"] for p in partners)
+_hiring = sorted((p for p in partners if p["jobs"]), key=lambda p: (-len(p["jobs"]), p["n"]))
+_elite = sorted(p["n"] for p in partners if p.get("tier") == "Elite")
+_in_reg = {r: sum(r in p["r"] for p in partners) for r in REG}
+dir_answer = (f'<p class="answer"><b>What is an IFS implementation partner?</b> A company that IFS authorises to sell, implement, extend or support IFS Cloud and IFS Applications. '
+              f'This directory lists {len(partners)} verified IFS partner companies: {_kinds["S"]} IFS specialists, {_kinds["B"]} ERP boutiques and {_kinds["G"]} global consulting firms. '
+              f'{len(_hiring)} of them {"is" if len(_hiring) == 1 else "are"} hiring for IFS roles on findifsjobs today.</p>')
+choose = ('<div class="prose"><h2>How to choose an IFS implementation partner</h2><ul>'
+          '<li><b>Industry first.</b> IFS projects go best with a partner that already knows your processes. Start with the partners for your industry below.</li>'
+          '<li><b>Region and language.</b> Check where the partner has people on the ground, not just where it sells. Each profile lists the regions it works in.</li>'
+          '<li><b>Product coverage.</b> ERP, enterprise asset management (EAM) and field service (FSM) are different skills. Ask for live IFS Cloud projects in the modules you need.</li>'
+          '<li><b>Size that fits the project.</b> Global firms suit multi-country programmes. IFS specialists and ERP boutiques usually give mid-sized companies more senior attention.</li>'
+          '<li><b>Partner status.</b> Confirm the firm in the IFS partner directory. Every profile here links to the source we used.</li>'
+          '<li><b>Bench depth.</b> Ask how many certified IFS consultants they have and how they hire. A partner that is recruiting for your modules is growing in them; see '
+          '<a href="../guides/which-ifs-partners-are-hiring/">which IFS partners are hiring</a>.</li></ul>'
+          '<p>Read more in <a href="../guides/what-is-an-ifs-partner/">IFS partner types and levels</a> or compare the <a href="../top-ifs-partners/">regional Top 10 lists</a>.</p></div>')
+by_region = links([(f"{REG[r][0]}", f"top-ifs-partners/{REG[r][2]}/", _in_reg[r]) for r in REG if _in_reg[r]], "../")
+dir_faq, dir_faq_ld = faq([
+    ("How many IFS partners are there?", f"findifsjobs lists {len(partners)} verified IFS partner companies. IFS's own network is larger; firms appear here once the IFS partner directory, an IFS announcement or an IFS event listing confirms them."),
+    ("Which IFS partners are hiring right now?", ("The partners with the most open IFS roles on findifsjobs today are " + ", ".join(f"{p['n']} ({len(p['jobs'])})" for p in _hiring[:5]) + ".") if _hiring
+     else "No partner roles are on the board today."),
+    ("Which IFS partners are listed at Elite level?", ("In the partner listings we use, " + ", ".join(_elite[:-1]) + f" and {_elite[-1]} are shown as Elite." if len(_elite) > 1 else
+                                                       f"{_elite[0]} is shown as Elite." if _elite else "None of the firms here has a published Elite level.")),
+    ("What is the difference between an IFS specialist, an ERP boutique and a global firm?", "An IFS specialist works only on IFS. An ERP boutique covers IFS alongside other ERP systems. A global firm is a large consultancy with an IFS practice."),
+    ("How is this list ordered?", "Emerging firms first: the findifsjobs score favours IFS specialists, recent growth, awards from 2023 to 2025 and partner tier. It is an editorial order, not an IFS one. Use the sort menu for A to Z or tier order."),
+])
+page("partners/", f"IFS partner companies: {len(partners)} IFS implementation partners ({TODAY.year}) | findifsjobs",
+     f"Directory of {len(partners)} verified IFS implementation partners across eight regions: specialists, ERP boutiques and global firms, with tier, size, focus, open jobs and careers links.",
+     hero("Partner directory", f"IFS implementation partners: {len(partners)} verified firms", "Every firm is confirmed as an IFS partner by the IFS directory, an IFS announcement or an IFS event listing. Emerging firms are listed first.")
+     + f'<div class="wrap"><div class="prose">{dir_answer}</div>{toolbar}<p class="muted small" id="p-count">{len(partners)} of {len(partners)} partners</p><ul class="grid" id="p-list">{cells}</ul>'
+     + f'{choose}<section class="stack"><h2>IFS partners by industry</h2>{ind_links("../")}</section>'
+     + f'<section class="stack"><h2>IFS partners by region</h2>{by_region}</section>'
+     + f'<section class="stack"><h2>IFS partners by country</h2>{links([(c, f"ifs-partners/{slug(c)}/", len(v)) for c, v in PC_PAGES.items()], "../")}</section>{mstrip("../")}{dir_faq}</div>',
+     active="partners/", crumbs=[("Partner directory", None)], priority="0.8",
+     ld=[dir_faq_ld, {"@context": "https://schema.org", "@type": "ItemList", "name": "IFS implementation partners", "numberOfItems": len(partners),
+                      "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": p["n"], "url": f"{SITE}/{p['path']}"}
+                                          for i, p in enumerate(sorted(partners, key=lambda p: (-p["score"], p["n"])))]}])
 
 # ---- sitemap, robots, llms.txt
 (OUT / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(
