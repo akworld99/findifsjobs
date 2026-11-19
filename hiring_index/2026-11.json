@@ -1,31 +1,31 @@
 {
  "month": "2026-11",
- "as_of": "2026-11-18",
- "roles": 143,
+ "as_of": "2026-11-19",
+ "roles": 148,
  "employers": 17,
  "countries": 19,
  "cloud": 39,
- "remote": 42,
+ "remote": 46,
  "by_area": [
   [
    "Architecture",
    26
   ],
   [
-   "Technical / Development",
+   "Finance",
    19
   ],
   [
    "Supply Chain",
-   18
+   19
   ],
   [
-   "Finance",
-   17
+   "Technical / Development",
+   19
   ],
   [
    "Multi-module",
-   14
+   15
   ],
   [
    "Project Management",
@@ -33,7 +33,7 @@
   ],
   [
    "EAM / Maintenance",
-   10
+   11
   ],
   [
    "Manufacturing",
@@ -50,12 +50,12 @@
  ],
  "by_country": [
   [
-   "Sri Lanka",
-   22
+   "United States",
+   23
   ],
   [
-   "United States",
-   19
+   "Sri Lanka",
+   22
   ],
   [
    "United Kingdom",
@@ -86,8 +86,8 @@
    4
   ],
   [
-   "India",
-   2
+   "Brazil",
+   3
   ]
  ],
  "by_employer": [
@@ -112,6 +112,10 @@
    6
   ],
   [
+   "Tsunami Tsolutions",
+   5
+  ],
+  [
    "Eqeep",
    5
   ],
@@ -126,16 +130,12 @@
   [
    "InfoConsulting",
    4
-  ],
-  [
-   "Enterprise Analytics",
-   3
   ]
  ],
  "by_type": [
   [
    "IFS partner",
-   67
+   71
   ],
   [
    "IFS vendor",
@@ -147,7 +147,7 @@
   ],
   [
    "IFS customer",
-   1
+   2
   ]
  ],
  "role_mix": [
