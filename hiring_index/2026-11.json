@@ -1,11 +1,11 @@
 {
  "month": "2026-11",
- "as_of": "2026-11-19",
- "roles": 148,
+ "as_of": "2026-11-20",
+ "roles": 150,
  "employers": 17,
  "countries": 19,
  "cloud": 39,
- "remote": 46,
+ "remote": 48,
  "by_area": [
   [
    "Architecture",
@@ -29,11 +29,11 @@
   ],
   [
    "Project Management",
-   13
+   14
   ],
   [
    "EAM / Maintenance",
-   11
+   12
   ],
   [
    "Manufacturing",
@@ -51,7 +51,7 @@
  "by_country": [
   [
    "United States",
-   23
+   25
   ],
   [
    "Sri Lanka",
@@ -66,12 +66,12 @@
    11
   ],
   [
-   "Netherlands",
+   "Japan",
    10
   ],
   [
-   "Japan",
-   10
+   "Netherlands",
+   9
   ],
   [
    "Switzerland",
@@ -93,7 +93,7 @@
  "by_employer": [
   [
    "IFS",
-   61
+   63
   ],
   [
    "Arcwide",
@@ -139,7 +139,7 @@
   ],
   [
    "IFS vendor",
-   61
+   63
   ],
   [
    "Recruiter",
@@ -153,7 +153,7 @@
  "role_mix": [
   [
    "Functional consultant",
-   63
+   64
   ],
   [
    "Technical and developer",
@@ -165,7 +165,7 @@
   ],
   [
    "Project manager",
-   13
+   14
   ],
   [
    "Support",
