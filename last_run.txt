@@ -1,4 +1,4 @@
-Run 2026-11-20 08:55 UTC, 150 jobs on the board
+Run 2026-11-21 08:38 UTC, 149 jobs on the board
 
 IFS                   smartrecruiters   51 jobs
 Arcwide               teamtailor        23 jobs
@@ -9,7 +9,7 @@ Eqeep                 smartrecruiters    4 jobs
 Inivos                workable           2 jobs
 Tsunami Tsolutions    breezy             5 jobs
 WIA Systems           html               5 jobs
-Enterprise Analytics  html            FAILED  <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1011)>
+Enterprise Analytics  html            FAILED  HTTP Error 404: Not Found
     Kaizens Group: page 114363 chars, 36 links, 6 job-like; sample ['https://kaizens.co.uk/careers/full-stack-developer-2', 'https://kaizens.co.uk/careers/software-engineer', 'https://kaizens.co.uk/careers/ai-engineer-associate', 'https://kaizens.co.uk/careers/data-scientist', 'https://kaizens.co.uk/careers/ai-ml-engineer']
 Kaizens Group         html               0 jobs
 Iconique              html               2 jobs
@@ -18,5 +18,5 @@ Xitricon              html               1 jobs
 Solika Consulting     html               1 jobs
 BW Energy             workable           2 jobs
 GoLive Recruitment    wprss              7 jobs
-    Cubiq Recruitment: page 249421 chars, 101 links, 16 job-like; sample ['https://www.cubiqrecruitment.com/jobs/robotics-field-engineer/', 'https://www.cubiqrecruitment.com/jobs/senior-perception-engineer/', 'https://www.cubiqrecruitment.com/jobs/director-of-brand-marcomms/', 'https://www.cubiqrecruitment.com/jobs/robotics-engineer/', 'https://www.cubiqrecruitment.com/jobs/cfd-engineer/']
+    Cubiq Recruitment: page 249424 chars, 101 links, 16 job-like; sample ['https://www.cubiqrecruitment.com/jobs/robotics-field-engineer/', 'https://www.cubiqrecruitment.com/jobs/senior-perception-engineer/', 'https://www.cubiqrecruitment.com/jobs/director-of-brand-marcomms/', 'https://www.cubiqrecruitment.com/jobs/robotics-engineer/', 'https://www.cubiqrecruitment.com/jobs/cfd-engineer/']
 Cubiq Recruitment     html               0 jobs

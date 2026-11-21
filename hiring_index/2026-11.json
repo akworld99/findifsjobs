@@ -1,7 +1,7 @@
 {
  "month": "2026-11",
- "as_of": "2026-11-20",
- "roles": 150,
+ "as_of": "2026-11-21",
+ "roles": 149,
  "employers": 17,
  "countries": 19,
  "cloud": 39,
@@ -9,7 +9,7 @@
  "by_area": [
   [
    "Architecture",
-   26
+   25
   ],
   [
    "Finance",
@@ -79,7 +79,7 @@
   ],
   [
    "Australia",
-   5
+   4
   ],
   [
    "Austria",
@@ -93,7 +93,7 @@
  "by_employer": [
   [
    "IFS",
-   63
+   62
   ],
   [
    "Arcwide",
@@ -139,7 +139,7 @@
   ],
   [
    "IFS vendor",
-   63
+   62
   ],
   [
    "Recruiter",
@@ -161,7 +161,7 @@
   ],
   [
    "Solution architect",
-   26
+   25
   ],
   [
    "Project manager",
