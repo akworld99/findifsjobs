@@ -1,6 +1,6 @@
-Run 2026-11-22 08:33 UTC, 149 jobs on the board
+Run 2026-11-23 09:32 UTC, 148 jobs on the board
 
-IFS                   smartrecruiters   51 jobs
+IFS                   smartrecruiters   50 jobs
 Arcwide               teamtailor        23 jobs
 Novacura              teamtailor         3 jobs
 Addovation            teamtailor         0 jobs
@@ -9,7 +9,7 @@ Eqeep                 smartrecruiters    4 jobs
 Inivos                workable           2 jobs
 Tsunami Tsolutions    breezy             5 jobs
 WIA Systems           html               5 jobs
-Enterprise Analytics  html            FAILED  <urlopen error [Errno -5] No address associated with hostname>
+Enterprise Analytics  html               3 jobs
     Kaizens Group: page 114363 chars, 36 links, 6 job-like; sample ['https://kaizens.co.uk/careers/full-stack-developer-2', 'https://kaizens.co.uk/careers/software-engineer', 'https://kaizens.co.uk/careers/ai-engineer-associate', 'https://kaizens.co.uk/careers/data-scientist', 'https://kaizens.co.uk/careers/ai-ml-engineer']
 Kaizens Group         html               0 jobs
 Iconique              html               2 jobs
