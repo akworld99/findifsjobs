@@ -1,8 +1,8 @@
-Run 2026-11-23 09:32 UTC, 148 jobs on the board
+Run 2026-11-24 11:27 UTC, 151 jobs on the board
 
-IFS                   smartrecruiters   50 jobs
+IFS                   smartrecruiters   49 jobs
 Arcwide               teamtailor        23 jobs
-Novacura              teamtailor         3 jobs
+Novacura              teamtailor         4 jobs
 Addovation            teamtailor         0 jobs
 InfoConsulting        recruitee          2 jobs
 Eqeep                 smartrecruiters    4 jobs
@@ -12,11 +12,11 @@ WIA Systems           html               5 jobs
 Enterprise Analytics  html               3 jobs
     Kaizens Group: page 114363 chars, 36 links, 6 job-like; sample ['https://kaizens.co.uk/careers/full-stack-developer-2', 'https://kaizens.co.uk/careers/software-engineer', 'https://kaizens.co.uk/careers/ai-engineer-associate', 'https://kaizens.co.uk/careers/data-scientist', 'https://kaizens.co.uk/careers/ai-ml-engineer']
 Kaizens Group         html               0 jobs
-Iconique              html               2 jobs
+Iconique              html               3 jobs
 Xitricon              html               1 jobs
 12Guide               html               3 jobs
 Solika Consulting     html               1 jobs
 BW Energy             workable           2 jobs
 GoLive Recruitment    wprss              7 jobs
-    Cubiq Recruitment: page 249424 chars, 101 links, 16 job-like; sample ['https://www.cubiqrecruitment.com/jobs/robotics-field-engineer/', 'https://www.cubiqrecruitment.com/jobs/senior-perception-engineer/', 'https://www.cubiqrecruitment.com/jobs/director-of-brand-marcomms/', 'https://www.cubiqrecruitment.com/jobs/robotics-engineer/', 'https://www.cubiqrecruitment.com/jobs/cfd-engineer/']
+    Cubiq Recruitment: page 249407 chars, 101 links, 16 job-like; sample ['https://www.cubiqrecruitment.com/jobs/research-engineer/', 'https://www.cubiqrecruitment.com/jobs/robotics-field-engineer/', 'https://www.cubiqrecruitment.com/jobs/senior-perception-engineer/', 'https://www.cubiqrecruitment.com/jobs/director-of-brand-marcomms/', 'https://www.cubiqrecruitment.com/jobs/robotics-engineer/']
 Cubiq Recruitment     html               0 jobs

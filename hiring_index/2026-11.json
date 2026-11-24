@@ -1,15 +1,19 @@
 {
  "month": "2026-11",
- "as_of": "2026-11-23",
- "roles": 148,
+ "as_of": "2026-11-24",
+ "roles": 151,
  "employers": 17,
  "countries": 19,
  "cloud": 39,
- "remote": 48,
+ "remote": 49,
  "by_area": [
   [
    "Architecture",
    24
+  ],
+  [
+   "Technical / Development",
+   20
   ],
   [
    "Finance",
@@ -20,12 +24,8 @@
    19
   ],
   [
-   "Technical / Development",
-   19
-  ],
-  [
    "Multi-module",
-   15
+   16
   ],
   [
    "Project Management",
@@ -33,7 +33,7 @@
   ],
   [
    "EAM / Maintenance",
-   12
+   13
   ],
   [
    "Manufacturing",
@@ -51,7 +51,7 @@
  "by_country": [
   [
    "United States",
-   25
+   26
   ],
   [
    "Sri Lanka",
@@ -62,11 +62,11 @@
    12
   ],
   [
-   "Japan",
-   10
+   "Sweden",
+   11
   ],
   [
-   "Sweden",
+   "Japan",
    10
   ],
   [
@@ -93,7 +93,7 @@
  "by_employer": [
   [
    "IFS",
-   61
+   62
   ],
   [
    "Arcwide",
@@ -105,7 +105,7 @@
   ],
   [
    "Novacura",
-   6
+   7
   ],
   [
    "GoLive Recruitment",
@@ -135,11 +135,11 @@
  "by_type": [
   [
    "IFS partner",
-   71
+   73
   ],
   [
    "IFS vendor",
-   61
+   62
   ],
   [
    "Recruiter",
@@ -153,11 +153,11 @@
  "role_mix": [
   [
    "Functional consultant",
-   64
+   65
   ],
   [
    "Technical and developer",
-   19
+   20
   ],
   [
    "Solution architect",
