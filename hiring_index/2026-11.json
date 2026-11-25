@@ -1,7 +1,7 @@
 {
  "month": "2026-11",
- "as_of": "2026-11-24",
- "roles": 151,
+ "as_of": "2026-11-25",
+ "roles": 150,
  "employers": 17,
  "countries": 19,
  "cloud": 39,
@@ -9,7 +9,7 @@
  "by_area": [
   [
    "Architecture",
-   24
+   23
   ],
   [
    "Technical / Development",
@@ -66,11 +66,11 @@
    11
   ],
   [
-   "Japan",
-   10
+   "Netherlands",
+   9
   ],
   [
-   "Netherlands",
+   "Japan",
    9
   ],
   [
@@ -93,7 +93,7 @@
  "by_employer": [
   [
    "IFS",
-   62
+   61
   ],
   [
    "Arcwide",
@@ -139,7 +139,7 @@
   ],
   [
    "IFS vendor",
-   62
+   61
   ],
   [
    "Recruiter",
@@ -161,7 +161,7 @@
   ],
   [
    "Solution architect",
-   24
+   23
   ],
   [
    "Project manager",
