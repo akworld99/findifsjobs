@@ -1,10 +1,10 @@
 {
  "month": "2026-11",
- "as_of": "2026-11-25",
- "roles": 150,
+ "as_of": "2026-11-26",
+ "roles": 152,
  "employers": 17,
  "countries": 19,
- "cloud": 39,
+ "cloud": 40,
  "remote": 49,
  "by_area": [
   [
@@ -13,14 +13,14 @@
   ],
   [
    "Technical / Development",
+   21
+  ],
+  [
+   "Supply Chain",
    20
   ],
   [
    "Finance",
-   19
-  ],
-  [
-   "Supply Chain",
    19
   ],
   [
@@ -41,11 +41,11 @@
   ],
   [
    "Sales / Presales",
-   4
+   5
   ],
   [
-   "Support / Admin",
-   4
+   "Projects",
+   3
   ]
  ],
  "by_country": [
@@ -59,7 +59,7 @@
   ],
   [
    "United Kingdom",
-   12
+   13
   ],
   [
    "Sweden",
@@ -79,7 +79,7 @@
   ],
   [
    "Australia",
-   4
+   5
   ],
   [
    "Austria",
@@ -93,7 +93,7 @@
  "by_employer": [
   [
    "IFS",
-   61
+   62
   ],
   [
    "Arcwide",
@@ -112,6 +112,10 @@
    6
   ],
   [
+   "Inivos",
+   5
+  ],
+  [
    "Tsunami Tsolutions",
    5
   ],
@@ -124,10 +128,6 @@
    5
   ],
   [
-   "Inivos",
-   4
-  ],
-  [
    "InfoConsulting",
    4
   ]
@@ -135,11 +135,11 @@
  "by_type": [
   [
    "IFS partner",
-   73
+   74
   ],
   [
    "IFS vendor",
-   61
+   62
   ],
   [
    "Recruiter",
@@ -157,7 +157,7 @@
   ],
   [
    "Technical and developer",
-   20
+   21
   ],
   [
    "Solution architect",
@@ -169,7 +169,7 @@
   ],
   [
    "Support",
-   4
+   3
   ]
  ]
 }
