@@ -32,6 +32,7 @@ import json
 import os
 import re
 import sys
+import urllib.error
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -393,8 +394,11 @@ def fetch_html(url, name, ctype, ifs_only):
     If the link text is just "Apply" or a whole card, the title comes from the link address."""
     page = get(url).decode("utf-8", "ignore")
     seen, out, links = set(), [], LINK.findall(page)
+    # Relative links resolve against <base href> when the page sets one (12Guide does); ignoring it built broken addresses.
+    bm = re.search(r"<base\b[^>]*href=[\"']([^\"']+)[\"']", page, re.I)
+    base = urllib.parse.urljoin(url, html.unescape(bm.group(1).strip())) if bm else url
     for href, inner in links:
-        full = urllib.parse.urljoin(url, html.unescape(href.strip()))
+        full = urllib.parse.urljoin(base, html.unescape(href.strip()))
         if not full.startswith("https://") or full.rstrip("/") == url.rstrip("/") or not JOB_PATH.search(full):
             continue
         title = strip_html(inner)
@@ -440,6 +444,95 @@ FETCHERS = {"smartrecruiters": fetch_smartrecruiters, "teamtailor": fetch_teamta
 
 
 # -------------------------------------------------------------------- merge
+# ------------------------------------------------------------------ closed jobs and missing locations
+FEED_KINDS = {"smartrecruiters", "teamtailor", "recruitee", "workable", "greenhouse", "lever", "breezy"}
+GRACE_DAYS = 2            # a job missing from a feed that loaded fine for this long has been taken down
+RECHECK_DAYS = 7          # how often to re-read a posting whose location we could not find
+
+
+def fetch_posting(url):
+    """(HTTP status, page text) for a job's own page. Status is None when the site could not be reached."""
+    try:
+        return 200, get(url).decode("utf-8", "ignore")
+    except urllib.error.HTTPError as ex:
+        return ex.code, ""
+    except Exception:
+        return None, ""
+
+
+def posting_details(page, title):
+    """Location, work mode and an advert extract from an employer's own job page.
+
+    Careers pages usually print the location in the short lines right under the job title
+    ("IFS Technical Consultant / Sri Lanka / Hybrid"). Only those lines are read, and a country
+    is used only when exactly one is named there. Nothing is inferred from where the company is based."""
+    body = re.sub(r"(?is)<head\b.*?</head\s*>|<(script|style|noscript|svg|nav|footer|form)\b.*?</\1\s*>", " ", page)
+    text = re.sub(r"(?i)<br\s*/?>|</(p|div|li|h[1-6]|span|section|article|td|dd|dt|a|ul)\s*>", "\n", body)
+    lines = [x for x in (strip_html(x) for x in text.split("\n")) if x]
+    norm = lambda s: re.sub(r"[^a-z0-9]+", " ", s.lower()).strip()
+    t = norm(title)
+    idx = next((i for i, x in enumerate(lines) if norm(x) == t), None)
+    if idx is None:
+        return {}
+    out = {}
+    head = [x for x in lines[idx + 1: idx + 6] if len(x) <= 40]
+    found = {c for x in head for c, rx in PLACES.items() if re.search(rx, x, re.I)}
+    if len(found) == 1:
+        country = found.pop()
+        out["country"] = country
+        line = next(x for x in head if re.search(PLACES[country], x, re.I))
+        parts = [p.strip() for p in re.split(r"\s*[,|/·]\s*", line) if p.strip()]
+        if len(parts) > 1 and not re.fullmatch(r"uk|usa?|uae|" + re.escape(country.lower()), parts[0].lower()):
+            out["city"] = parts[0]
+    mode = next((m for x in head for m, rx in (("Remote", r"remote"), ("Hybrid", r"hybrid"), ("On-site", r"on-?site")) if re.fullmatch(rf"\(?{rx}\)?", x, re.I)), None)
+    if mode:
+        out["work_mode"] = mode
+    long = [x for x in lines[idx + 1:] if len(x) > 80][:12]
+    if long:
+        out["detail"] = " ".join(long)
+    return out
+
+
+def tidy(jobs, ok):
+    """Drop jobs that have closed and fill in locations that the listing page did not give.
+
+    ok maps each source that loaded fine on this run to its kind. A job missing from a feed that
+    loaded fine is closed. A job from an HTML careers page or a WordPress feed is checked at its own
+    address, and a 404 or 410 means it is gone. Jobs from sources that failed today are left alone
+    and expire after EXPIRE_DAYS as before."""
+    today, grace = dt.date.today(), (dt.date.today() - dt.timedelta(days=GRACE_DAYS)).isoformat()
+    recheck = (today - dt.timedelta(days=RECHECK_DAYS)).isoformat()
+    keep, closed, located = [], 0, 0
+    for j in jobs:
+        kind = ok.get(j["company"])
+        if kind in FEED_KINDS and j.get("last_seen", TODAY) < grace:
+            closed += 1
+            continue
+        unlocated = j.get("country") in (None, "", "Not stated") and j.get("located_on", "") < recheck
+        if kind and kind not in FEED_KINDS:
+            status, page = fetch_posting(j["url"])
+            if status in (404, 410):
+                closed += 1
+                continue
+            if unlocated and page:
+                j["located_on"] = TODAY
+                d = posting_details(page, j["title"])
+                if d.get("country"):
+                    j["country"], located = d["country"], located + 1
+                    j["city"] = d.get("city") or j.get("city") or "Not stated"
+                    j["region"] = next((r for r, rx in REGIONS.items() if re.fullmatch(rx, d["country"].lower())), "Location not stated")
+                    where = ", ".join(x for x in (d.get("city"), d["country"]) if x)
+                    j["summary"] = re.sub(r"\.$", f" in {where}.", j.get("summary") or "") if " in " not in (j.get("summary") or "") else j["summary"]
+                if d.get("work_mode") and j.get("work_mode") in (None, "Not stated"):
+                    j["work_mode"] = d["work_mode"]
+                if d.get("detail") and not j.get("excerpt"):
+                    j["excerpt"] = excerpt(d["detail"])
+        keep.append(j)
+    REPORT.append(f"\nClosed jobs removed: {closed}. Locations found on the employer's own page: {located}.")
+    print(f"Closed jobs removed: {closed}; locations found: {located}")
+    return keep
+
+
 def key(j):
     norm = lambda s: re.sub(r"[^a-z0-9]+", "", (s or "").lower())
     return norm(j["title"]) + "|" + norm(j["company"]) + "|" + norm(j["country"])
@@ -468,10 +561,13 @@ def main():
     for j in existing:                       # jobs added by hand get dated on first run
         j.setdefault("first_seen", TODAY)
         j.setdefault("last_seen", TODAY)
-    fresh, failed = [], []
+    fresh, failed, ok = [], [], {}
     for kind, ident, name, ctype, ifs_only in SOURCES:
         try:
             got = FETCHERS[kind](ident, name, ctype, ifs_only)
+            # A feed that comes back empty may be a glitch, so it does not count as proof that its jobs closed.
+            if got or kind not in FEED_KINDS:
+                ok[name] = kind
             print(f"{name:<18}{kind:<16}{len(got):>4} IFS jobs")
             REPORT.append(f"{name:<22}{kind:<16}{len(got):>4} jobs")
             fresh += got
@@ -486,7 +582,7 @@ def main():
     except Exception as e:
         failed.append("Adzuna")
         print(f"Adzuna            FAILED  {e}")
-    merged = merge(existing, fresh)
+    merged = tidy(merge(existing, fresh), ok)
     OUT.write_text(json.dumps(merged, ensure_ascii=False, indent=1), encoding="utf-8")
     (HERE / "last_run.txt").write_text(f"Run {dt.datetime.utcnow():%Y-%m-%d %H:%M} UTC, {len(merged)} jobs on the board\n\n" + "\n".join(REPORT) + "\n", encoding="utf-8")
     print(f"\n{len(merged)} jobs in {OUT.name} ({len(fresh)} fetched this run, {len(failed)} sources failed)")
@@ -514,6 +610,32 @@ def selftest():
     a = make_job("IFS Developer", "Acme", "IFS customer", "Leeds", "United Kingdom", "https://x/1")
     b = make_job("IFS  developer", "ACME", "IFS customer", "Leeds", "United Kingdom", "https://x/2")
     assert len(merge([], [a, b])) == 1
+    # Location under the job title, as Kaizens and GoLive print it; company HQ text further down is ignored.
+    page = ("<html><head><title>IFS Technical Consultant</title></head><body><nav>Home Careers</nav><h1>IFS Technical Consultant</h1>"
+            "<p>Sri Lanka</p><p>Hybrid</p><h2>Description</h2><p>" + "Headquartered in the UK with teams in India and Australia, we deliver IFS projects. " * 3 + "</p></body></html>")
+    d = posting_details(page, "IFS Technical Consultant")
+    assert d.get("country") == "Sri Lanka" and d.get("work_mode") == "Hybrid" and d.get("detail"), d
+    assert posting_details("<h1>IFS Solution Architect</h1><div>London, UK</div>", "IFS Solution Architect") == {"country": "United Kingdom", "city": "London"}
+    assert "country" not in posting_details("<h1>IFS Consultant</h1><p>London</p><p>Colombo</p>", "IFS Consultant")   # two countries: not used
+    assert posting_details("<h1>Other role</h1><p>USA</p>", "IFS Consultant") == {}
+    # Closed jobs: gone from a feed that loaded fine (after the grace days) or a 404 at the posting itself.
+    old = (dt.date.today() - dt.timedelta(days=GRACE_DAYS + 1)).isoformat()
+    jobs = [{"company": "Feed Co", "title": "A", "url": "https://x/a", "last_seen": old, "country": "Sweden"},
+            {"company": "Feed Co", "title": "B", "url": "https://x/b", "last_seen": TODAY, "country": "Sweden"},
+            {"company": "Down Co", "title": "C", "url": "https://x/c", "last_seen": old, "country": "Sweden"}]
+    assert [j["title"] for j in tidy(jobs, {"Feed Co": "workable"})] == ["B", "C"]
+    real = globals()["fetch_posting"]
+    globals()["fetch_posting"] = lambda url: (404, "") if url.endswith("/gone") else (200, page)
+    try:
+        jobs = [{"company": "Page Co", "title": "IFS Technical Consultant", "url": "https://x/live", "last_seen": TODAY, "country": "Not stated",
+                 "city": "Not stated", "work_mode": "Not stated", "summary": "Technical role at Page Co."},
+                {"company": "Page Co", "title": "Gone", "url": "https://x/gone", "last_seen": TODAY, "country": "Not stated"}]
+        out = tidy(jobs, {"Page Co": "html"})
+        assert len(out) == 1 and out[0]["country"] == "Sri Lanka" and out[0]["region"] == "APAC" and out[0]["work_mode"] == "Hybrid", out
+        assert out[0]["summary"] == "Technical role at Page Co in Sri Lanka." and out[0]["excerpt"], out[0]
+    finally:
+        globals()["fetch_posting"] = real
+    REPORT.clear()
     print("selftest passed")
 
 
