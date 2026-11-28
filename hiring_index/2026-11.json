@@ -1,46 +1,46 @@
 {
  "month": "2026-11",
  "as_of": "2026-11-28",
- "roles": 154,
- "employers": 17,
- "countries": 18,
- "cloud": 39,
- "remote": 50,
+ "roles": 119,
+ "employers": 15,
+ "countries": 19,
+ "cloud": 31,
+ "remote": 45,
  "by_area": [
   [
    "Architecture",
-   24
+   17
   ],
   [
    "Supply Chain",
-   21
-  ],
-  [
-   "Technical / Development",
-   20
-  ],
-  [
-   "Finance",
-   19
-  ],
-  [
-   "Multi-module",
    16
   ],
   [
+   "Technical / Development",
+   16
+  ],
+  [
+   "Finance",
+   16
+  ],
+  [
+   "Multi-module",
+   12
+  ],
+  [
    "EAM / Maintenance",
-   13
-  ],
-  [
-   "Project Management",
-   13
-  ],
-  [
-   "Manufacturing",
    10
   ],
   [
+   "Project Management",
+   9
+  ],
+  [
    "Sales / Presales",
+   7
+  ],
+  [
+   "Manufacturing",
    7
   ],
   [
@@ -51,65 +51,53 @@
  "by_country": [
   [
    "United States",
-   29
+   25
   ],
   [
    "Sri Lanka",
-   23
+   20
   ],
   [
    "United Kingdom",
-   13
-  ],
-  [
-   "Sweden",
    11
   ],
   [
-   "Netherlands",
-   9
+   "Sweden",
+   10
   ],
   [
    "Japan",
    9
   ],
   [
-   "Switzerland",
+   "Netherlands",
    6
   ],
   [
    "Australia",
-   4
-  ],
-  [
-   "Austria",
-   4
+   3
   ],
   [
    "Brazil",
+   3
+  ],
+  [
+   "Austria",
+   3
+  ],
+  [
+   "Switzerland",
    3
   ]
  ],
  "by_employer": [
   [
    "IFS",
-   65
+   52
   ],
   [
    "Arcwide",
-   27
-  ],
-  [
-   "Cubiq Recruitment",
-   8
-  ],
-  [
-   "Novacura",
-   7
-  ],
-  [
-   "Inivos",
-   6
+   23
   ],
   [
    "GoLive Recruitment",
@@ -120,30 +108,42 @@
    5
   ],
   [
-   "Eqeep",
-   5
-  ],
-  [
    "WIA Systems",
    5
   ],
   [
+   "Inivos",
+   4
+  ],
+  [
+   "Novacura",
+   4
+  ],
+  [
+   "Eqeep",
+   4
+  ],
+  [
    "Iconique",
+   3
+  ],
+  [
+   "Enterprise Analytics",
    3
   ]
  ],
  "by_type": [
   [
    "IFS partner",
-   73
+   59
   ],
   [
    "IFS vendor",
-   65
+   52
   ],
   [
    "Recruiter",
-   14
+   6
   ],
   [
    "IFS customer",
@@ -153,23 +153,19 @@
  "role_mix": [
   [
    "Functional consultant",
-   68
+   55
   ],
   [
    "Technical and developer",
-   20
+   16
   ],
   [
    "Solution architect",
-   24
+   17
   ],
   [
    "Project manager",
-   13
-  ],
-  [
-   "Support",
-   3
+   9
   ]
  ]
 }

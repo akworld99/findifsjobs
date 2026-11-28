@@ -1,4 +1,4 @@
-Run 2026-11-28 09:20 UTC, 154 jobs on the board
+Run 2026-11-28 13:07 UTC, 119 jobs on the board
 
 IFS                   smartrecruiters   53 jobs
 Arcwide               teamtailor        23 jobs
@@ -20,3 +20,5 @@ BW Energy             workable           2 jobs
 GoLive Recruitment    wprss              7 jobs
     Cubiq Recruitment: page 249407 chars, 101 links, 16 job-like; sample ['https://www.cubiqrecruitment.com/jobs/research-engineer/', 'https://www.cubiqrecruitment.com/jobs/robotics-field-engineer/', 'https://www.cubiqrecruitment.com/jobs/senior-perception-engineer/', 'https://www.cubiqrecruitment.com/jobs/director-of-brand-marcomms/', 'https://www.cubiqrecruitment.com/jobs/robotics-engineer/']
 Cubiq Recruitment     html               0 jobs
+
+Closed jobs removed: 35. Locations found on the employer's own page: 8.
