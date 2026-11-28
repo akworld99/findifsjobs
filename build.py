@@ -293,7 +293,7 @@ mstrip = lambda root: (f'<a class="mstrip" href="{root}marketing-for-ifs-partner
 if OUT.exists():
     shutil.rmtree(OUT)
 (OUT / "assets").mkdir(parents=True)
-for f in ("site.css", "site.js"):
+for f in ("site.css", "site.js", "og.jpg"):
     shutil.copy(HERE / "assets" / f, OUT / "assets" / f)
 for f in ("favicon.ico", "favicon.svg", "apple-touch-icon.png"):   # at the site root, where browsers and Google look first
     shutil.copy(HERE / "assets" / f, OUT / f)
