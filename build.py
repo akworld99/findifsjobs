@@ -188,7 +188,26 @@ NAV = [("", "Jobs"), ("top-ifs-partners/", "Top 10"), ("partners/", "Partners"),
        ("freelancers/", "Freelancers"), ("news/", "What's new"), ("ifs-hiring-report/", "Hiring report"), ("marketing-for-ifs-partners/", "Marketing")]
 
 
+def _seo_title(t, n=65):
+    """Keep titles inside what Google shows: drop the brand suffix first, then trim at a word."""
+    if len(t) <= n:
+        return t
+    if t.endswith(" | findifsjobs"):
+        t = t[: -len(" | findifsjobs")]
+    if len(t) <= n:
+        return t
+    return t[: n - 1].rsplit(" ", 1)[0].rstrip(" ,:;|/(") + "…"
+
+
+def _seo_desc(d, n=160):
+    """Trim long meta descriptions at a word so search results show a complete thought."""
+    if len(d) <= n:
+        return d
+    return d[: n - 1].rsplit(" ", 1)[0].rstrip(" ,:;|/(") + "…"
+
+
 def page(path, title, desc, body, active="", ld=(), crumbs=(), priority="0.6", lastmod=None, index=True):
+    title, desc = _seo_title(title), _seo_desc(desc)
     depth = len([s for s in path.split("/") if s]) if not path.endswith(".html") else 0
     root = "/" if path == "404.html" else "../" * depth
     url = f"{SITE}/{path}" if path != "404.html" else SITE + "/"
@@ -215,7 +234,8 @@ def page(path, title, desc, body, active="", ld=(), crumbs=(), priority="0.6", l
             f'{f"<meta name=\"google-site-verification\" content=\"{e(sc)}\">" if sc else ""}'
             f'{f"<meta name=\"msvalidate.01\" content=\"{e(CFG.get("bing_meta"))}\">" if CFG.get("bing_meta") else ""}'
             f'<meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{e(url)}">'
-            f'<meta property="og:type" content="website"><meta property="og:site_name" content="findifsjobs"><meta name="twitter:card" content="summary">'
+            f'<meta property="og:type" content="website"><meta property="og:site_name" content="findifsjobs"><meta name="twitter:card" content="summary_large_image">'
+            f'<meta property="og:image" content="{SITE}/assets/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:image" content="{SITE}/assets/og.jpg">'
             f'<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
             f'<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">'
             f'<link rel="icon" href="{root}favicon.ico" sizes="48x48"><link rel="icon" href="{root}favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="{root}apple-touch-icon.png">'
